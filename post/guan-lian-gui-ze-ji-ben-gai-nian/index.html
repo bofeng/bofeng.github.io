@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>关联规则-基本概念 | 0xBF</title>
+<meta name="description" content="">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://bofeng.github.io/favicon.ico?v=1587158968879">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://bofeng.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://bofeng.github.io">0xBF</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/open-source-license-flow-chart/" class="menu">
+                Open Source License
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>关联规则-基本概念</h1>
+            <p class="article-meta">
+              2010-02-06
+              
+                <a href="https://bofeng.github.io/tag/eAw-5Salr/" class="badge ">
+                  datamining
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p>分类，聚类，关联规则是数据挖掘的三大部分，先记下关联规则的概念</p>
+<!-- more -->
+<p>关联规则有两个关键概念，支持度和置信度。先放概念：关联规则是形如 X -&gt; Y的表达式，其中X和Y是不相交的项集。关联规则的强度可以用它的支持度和置信度来度量。支持度确定规则可以用于给定数据集的频繁程度，而置信度确定Y在包含X的事务中出现的频繁程度。</p>
+<p>举例配合下这个说明，著名的啤酒和尿布事件。</p>
+<p>假设有这几件物品， ［ 面包 ｜ 牛奶 ｜ 尿布 ｜ 啤酒 ｜ 鸡蛋 ｜ 可乐］，有以下几个客户的一次购买数据，0表示没有买，1表示买了：</p>
+<pre><code>［1，1，0，0，0，0］
+［1，0，1，1，1，0］
+［0，1，1，1，0，1］
+［1，1，1，1，0，0］
+［1，1，1，0，0，1］
+</code></pre>
+<p>比如第一项就表示，一个客户同时购买了面包和牛奶，第二个客户同时购买了面包，尿布，啤酒和鸡蛋，etc。考虑规则｛牛奶，尿布｝－》啤酒。其中｛牛奶，尿布，啤酒｝的支持度是2 （就是说，这三个 物品同时出现的次数有两次，也就是上面的第3和第4条），而事务的总数是5，所以规则的支持度是 2／5 ＝ 0.4。而置信度是｛牛奶，尿布，啤酒｝的支持度记数与项集｛牛奶，尿布｝的支持度记数的商。上面｛牛奶，尿布｝的支持度是3，（第3，4，5项）。所以这条规则｛牛奶，尿布｝－》啤酒的置信度为2／3 ＝ 0.67。或者我们可以更通俗的讲，如果 一个用户同时买了“牛奶和尿布”，那么他有67%的概率也会买啤酒。</p>
+<p>为什么使用支持度和置信度？</p>
+<ul>
+<li>支持度很低的规则可能只是偶尔出现，支持度通常用来删去那些不令人感兴趣的规则</li>
+<li>置信度通过规则进行推理的可靠性</li>
+</ul>
+<p>如何发现关联规则？给定事务的集合T，关联规则发现是指找出支持度大于等于minsup，并且置信度大于等于minconf的所有规则。其中minsup和minconf是对应的支持度和置信度阈值 。也就是说，产生关联规则需要以下两个步骤：</p>
+<ol>
+<li>频繁项集的产生，目标是发现满足最小支持阈值的所有项集，这些项集称作频繁项集。</li>
+<li>规则的产生，目标是从上一步发现的频繁项集中提取所有高置信度的规则，这些规则称作强规则。</li>
+</ol>
+<p>如上面的例子，0.4是规则｛牛奶，尿布｝－》啤酒的支持度，它的支持度是0.4，而它的置信度是0.67，假设我们规定支持度不小于0.4 的3项集为频繁3项集，置信度不小于0.6的为强规则。那么上面的这条就刚好可以成为强规则，因为它的支持度为0.4，所以不会在第一步被淘汰掉，接下来第二步，计算它的置信度为0.67，超过阈值0.6，所以也没有被淘汰掉，所以它就符合我们的要求成为了一个强规则，我们就可以认为“购买牛奶和尿布的人，有很大可能去买啤酒”</p>
+<p>好，明白了这个概念，来计算一下上面的例子中，会有多少频繁三项集。我们先思考一下算法，既然是计算频繁3项集的规则，那么首先要算出上面的3项集有多少个，其中又有哪些是频繁的（支持度大于0.4），得到这个频繁项集之后，再去看每个频繁项集可以产生多少强规则。</p>
+<p>一步一步来，先算出上面的3项集有多少个，上面一共有6个物品，一共的3项集就是6个物品的3项组合数，也就是C (6,3)＝20个；第二步，这20个中哪些的支持度是不小于0.4的，也就是在最上面5条的购买数据中，至少同时出现过2次。这一步我们只要拿到20个后，每个去查看他们在5条数据中是否符合“至少同时出现两次”的条件就行了，可以得到4个这样的频繁3项集：</p>
+<ol>
+<li>面包 尿布 啤酒 ==&gt; 0.4</li>
+<li>牛奶 尿布 啤酒 ==&gt; 0.4</li>
+<li>牛奶 尿布 可乐 ==&gt; 0.4</li>
+<li>面包 牛奶 尿布 ==&gt; 0.4</li>
+</ol>
+<p>然后到最后一步了。看每个频繁3项集能推出几个强规则（我们这里规定的阈值是0.6）。这里也分两步，首先算出每个频繁3项集可以产生多少规则（不一定是强规则）；第二步，看此规则是否是强规则。</p>
+<p>首先，每个频繁k项集可以产生 pow(2, k) – 2 个规则（为什么请自行思考）以第一个为例，｛面包，尿布，啤酒｝，可以产生的规则有 ：</p>
+<ol>
+<li>面包，尿布 －》啤酒</li>
+<li>面包，啤酒 －》尿布</li>
+<li>尿布，啤酒 －》 面包</li>
+<li>面包 －》尿布，啤酒</li>
+<li>尿布 －》面包，啤酒</li>
+<li>啤酒 －》面包，尿布</li>
+</ol>
+<p>一共有6个，这6个中哪些是强规则呢，我们规定的置信度阈值是0.6，因为已经知道｛面包，尿布，啤酒｝的支持度计数有2个了，所以一个规则的条件部分（规则左边的为条件部分）的支持度计数只要不大于3就行了（因为当为4的时候，置信度为2／4＝0.5，不满足0.6的阈值，当为3的时候，置信度为2／3=0.67，已满足0.6的阈值，当为2时就已经为2／2＝1.0了，也满足）。</p>
+<p>按这个思想，我们可以得出上面4条频繁3项集可以，每个可产生6个规则，最后可以产生24个规则，这24个规则中，只有以下几个规则是强规则（概率大于0.6）：</p>
+<pre><code>尿布 啤酒 ==&gt; 面包 [Conf:0.666666666667]
+面包 啤酒 ==&gt; 尿布 [Conf:1.0]
+面包 尿布 ==&gt; 啤酒 [Conf:0.666666666667]
+啤酒 ==&gt; 面包 尿布 [Conf:0.666666666667]
+尿布 啤酒 ==&gt; 牛奶 [Conf:0.666666666667]
+牛奶 啤酒 ==&gt; 尿布 [Conf:1.0]
+牛奶 尿布 ==&gt; 啤酒 [Conf:0.666666666667]
+啤酒 ==&gt; 牛奶 尿布 [Conf:0.666666666667]
+牛奶 尿布 ==&gt; 面包 [Conf:0.666666666667]
+面包 尿布 ==&gt; 牛奶 [Conf:0.666666666667]
+面包 牛奶 ==&gt; 尿布 [Conf:0.666666666667]
+尿布 可乐 ==&gt; 牛奶 [Conf:1.0]
+牛奶 可乐 ==&gt; 尿布 [Conf:1.0]
+牛奶 尿布 ==&gt; 可乐 [Conf:0.666666666667]
+可乐 ==&gt; 牛奶 尿布 [Conf:1.0]
+</code></pre>
+<p>上面列表中列出了强规则，并在最后用Conf列除了此规则的置信度。</p>
+<p>嗯，看起来还不赖，这有什么用呢？第12个强规则为例，它的置信度有100%，也就是说，当一个顾客购买了尿布，可乐两样东西后，那么就很有可能买牛奶。如果我们在购物架上把这三样东西放一块，或者如果是网购，发现ta买了这两样东西，可以直接推荐显示一个购买牛奶的链接，这样“无形中”就增加了销售额。</p>
+<p>上面根据例子介绍了关联规则的基本概念，上面的强规则计算也是python实现算法后自动计算出来的。这个部分先到这里，下一部分再介绍一种优化的算法来减少计算量。</p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://bofeng.github.io/images/avatar.png?v=1587158968879" class="no-responsive avatar">
+    <div class="text-muted"></div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/gnome-display-settings-enable-multiple-scales/">Gnome display settings enable multiple scales</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/array-and-pointer-in-c/">Array and Pointer in C</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/initialize-c-structure/">Initialize C Structure</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/back-pressure/">Back Pressure</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/threadinglocal-and-contextvarscontextvar/">threading.local and contextvars.ContextVar</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/starlette-quick-manual/">🌟 Starlette Quick Manual</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/deploy-poll-app-to-rocketchat/">🚀 Deploy Poll App to Rocket.chat</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/proxy-websocket-timeout/">🚁 Proxy Websocket Timeout </a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/proxy-websocket-configuration-in-apache-and-nginx/">Proxy Websocket Configuration in Apache and Nginx</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/passwd-and-shadow/">passwd &amp; shadow</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge ">
+          linux
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge ">
+          ubuntu
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Xp4pUvOV9/" class="badge success">
+          c
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/MIOrvhB7a/" class="badge secondary">
+          rocketchat
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/B-lE5rjJQ/" class="badge warning">
+          websocket
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4mqNg88O5/" class="badge secondary">
+          nginx
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ldB2Nthcy/" class="badge warning">
+          apache
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/jmsnxeb0L/" class="badge ">
+          webpy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dTSYjKA1x/" class="badge ">
+          passwd
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4NRPVT4nt/" class="badge success">
+          godaddy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Dr03KtaXl/" class="badge secondary">
+          raspi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/DfdCdjQwH/" class="badge success">
+          vnc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GLhh3mgC0/" class="badge secondary">
+          logroute
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Y-U7pc_rs/" class="badge success">
+          uwsgi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/2ldRfwlTHj/" class="badge secondary">
+          ngrok
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/N7uzveFEQ/" class="badge secondary">
+          flask
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/t46GgOmQJ/" class="badge secondary">
+          classmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/7tN2CvtD1N/" class="badge ">
+          staticmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eSZ5lHy7P/" class="badge success">
+          python
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/8bPDgHSAN/" class="badge secondary">
+          web
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vJnENzWsf/" class="badge secondary">
+          ssl
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dnoL5D0w-/" class="badge secondary">
+          mail
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/yuo6OYefk4/" class="badge secondary">
+          smtp
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GS8sncYwZ/" class="badge ">
+          rsync
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/EXump4cPm/" class="badge ">
+          pypi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/LzDugb5gQm/" class="badge success">
+          cors
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rLcaXQkmK/" class="badge secondary">
+          vim
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vLxhso05B/" class="badge warning">
+          strace
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/IbPl9to7C/" class="badge success">
+          google
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/X_VKuDyUs/" class="badge secondary">
+          opensource
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/JPaKbEpxsK/" class="badge secondary">
+          license
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/0uGMCxZDs/" class="badge ">
+          mkdocs
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/K5ngz4Z3X/" class="badge secondary">
+          cloudflare
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/XlycwU8qXZ/" class="badge ">
+          github
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/OLHLFT4if/" class="badge success">
+          ssh
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/AWO0Br2y4/" class="badge warning">
+          scratch
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0PlhyDUc/" class="badge secondary">
+          algorithm
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0zRGJ6aD/" class="badge ">
+          jQuery
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/3NETfISBbQ/" class="badge secondary">
+          js
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4zLHN4PXY/" class="badge warning">
+          docker
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ROXx9algt/" class="badge secondary">
+          opencourse
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/1KJQkim0xD/" class="badge secondary">
+          course
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/-Mmbm4s8hZ/" class="badge secondary">
+          education
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/QibBEdubUA/" class="badge ">
+          chromebook
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rMdHe7zYUx/" class="badge warning">
+          iOS
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/w0rUetnyT/" class="badge warning">
+          life
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ypaP9jx_V/" class="badge ">
+          hls
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ITnA4khP_/" class="badge warning">
+          protobuf
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/5XAvbVu7Y/" class="badge warning">
+          loadbalance
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/G6EOG9dUqx/" class="badge secondary">
+          server
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/v-BqS_DjJ/" class="badge ">
+          iPhone
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/I7SG4keW3/" class="badge secondary">
+          objc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/g_FfQMIOg/" class="badge secondary">
+          memcached
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eAw-5Salr/" class="badge warning">
+          datamining
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

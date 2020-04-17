@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>关联规则-剪枝算法 | 0xBF</title>
+<meta name="description" content="">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://bofeng.github.io/favicon.ico?v=1587158968879">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://bofeng.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://bofeng.github.io">0xBF</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/open-source-license-flow-chart/" class="menu">
+                Open Source License
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>关联规则-剪枝算法</h1>
+            <p class="article-meta">
+              2010-02-09
+              
+                <a href="https://bofeng.github.io/tag/eAw-5Salr/" class="badge warning">
+                  datamining
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p>上一篇简单介绍了关联规则的基本概念，继续这个部分，这篇来说一些稍微优化的算法，最后以“挖掘”我们的文具系统为例收尾。</p>
+<!-- more -->
+<p>上篇的“啤酒尿布”事件中，我们如果要算频繁三项集，使用的是“蛮力法”，即产生C(6,3) ＝20个 所有的三项集，再每个去判断它是不是频繁的。但数据集的项只有6个时，这不算什么，假设有400个时，如果要把全部三项集都算出来，那么要计算C(400,3) = 10586800 个，然后再去查每个是否是频繁的。有没有更快的方法，减少这么大的计算量？</p>
+<p>在上一个例子中，我们可以发现，鸡蛋在5个事务中，只出现了一次，而包含了鸡蛋的所有三项集的支持度计数都不会超过1，如果按上一篇，我们要求支持度为0.4，也就是要求在5个事务中，至少出现2次，所以这就意味着“所有包含了鸡蛋的三项集必然不符合要求”。这就意味着，我们可以先计算“频繁1项集”，对于不符合条件的1项集就直接减掉，不再在它的基础上产生3项集了。这样就大大减少了最后产生项集的个数。</p>
+<p>这个就是先验原理啦：</p>
+<blockquote>
+<p>如果一个项是，频繁的，则它的所有子集也一定是频繁的。相反，如果一个项集{a,b}是非频繁的，则它的所有超集也一定是非频繁的。</p>
+</blockquote>
+<p>Apriori算法中计算支持度计数，即是基于这个原理进行的剪枝：初始，每个项都被看作候选1项集。对它们的支持度计数后，候选项集的{鸡蛋}被丢弃，因为它的出现少于2个。在下一次迭代，仅使用频繁1项集来产生候选的2项集，因为先验原理保证所有的非频繁1项集的超级都是非频繁的。</p>
+<p>再进一步，如何产生频繁3项集？有几种方法，这里只介绍F(k-1) * F1 的方法，它最容易理解。以产生频繁3项集为例，先产生频繁1项集，然后使用F1 * F1 （交叉相乘扩展）的方法产生频繁2项“候选集”，通过这层过滤，得到频繁2项集F2，然后使用F2 * F1的方法来产生频繁3项“候选集”，再过滤产生F3，这样就产生了频繁3项集。这种方法不但每次过滤可以减掉很多不符合条件的分支，而且可以保证产生的频繁3项集是完全的，不会拉掉。因为每一个频繁k项集都是由一个频繁k-1项集和一个频繁1项集组成的。因此，所有产生的频繁k项集是这种方法所产生的候选k项集的一部分。</p>
+<p>好，这一步产生了频繁3项集，而上一篇介绍了，产生关联规则要两步，1，产生频繁项集，2，根据置信度条件产生规则。</p>
+<p>假设现在产生的频繁3项集是{a,b,c}，那么由它产生的规则可能由pow(2, k) -2 = pow(2, 3) – 2= 6 个，我们可以把这6个都列出来，例如 {a, b} -&gt; c ，然后每个根据上一篇提到的计算置信度的方法判断它的置信度是否符合条件。同样，3个还好，全部列出来也才6个，4个时就是14个，有没有更快的方法？</p>
+<p>Apriori的置信度剪枝基于这样的定理：</p>
+<blockquote>
+<p>如果规则 x -&gt; y – x 不满足置信度阈值，则形如 x' -&gt; y – x' 的规则也一定不满足置信度阈值，其中x'是x的子集。</p>
+</blockquote>
+<p>举个例子就明白了，定理永远那么拗口。以 {a, b, c, d｝是个频繁4项集为例，如果{b c d} -&gt; {a} 这条规则具有低置信度（即不符合置信度规定的阈值），（我们暂称{b c d}为前件，{a}为后件），则可以丢弃后件包含a的所有规则，包括{cd}-&gt;{ab}，{bd} -&gt; {ac}，{bc} -&gt; {ad} 和 {d} -&gt; {abc}。</p>
+<p>明白了吧，基于两种剪枝（支持度剪枝和置信度剪枝）我们大大减少了计算量，得到了最后的规则。</p>
+<p>来实践下，接下来这个例子是我们内部的文具订购系统的数据，感谢陈总导数据出来给我～ haha ～</p>
+<p>我们的文具订购系统从导出的数据上看，文具类型有将近400种（ps：我们每次订购的时候没有400种啊，可能是一些历史文具添加重复了，jiong～），导出的订购数据是从08年10月到10年10月左右，以每个人一次订购n个文具为一个事务的话，有将近8000个事务。</p>
+<p>先算一个，频繁2项集规则，把支持度设置为0.001（因为事务本身就有8000个了，所以0.001相当于要出现8次，置信度设置为0.4）这两个参数调的比较低，主要是为了多产生一些：</p>
+<pre><code>Concalate Support
+--------------------
+签字笔 啫喱笔 ==&gt; 0.00543066430917
+透明胶 透明胶座 ==&gt; 0.00101035615054
+裁纸刀 签字笔 ==&gt; 0.00101035615054
+啫喱笔 笔记本 ==&gt; 0.00151553422581
+回形针 回形针盒 ==&gt; 0.001389239707
+双头小记号笔 荧光笔 ==&gt; 0.00101035615054
+笔记本 拍纸本 ==&gt; 0.00101035615054
+笔记本 橡皮 ==&gt; 0.00113665066936
+签字笔 裁纸刀 ==&gt; 0.001389239707
+签字笔 固体胶 ==&gt; 0.00113665066936
+圆珠笔 签字笔 ==&gt; 0.00239959585754
+啫喱笔 手写标签 ==&gt; 0.00113665066936
+透明胶 啫喱笔 ==&gt; 0.00252589037636
+啫喱笔 笔刨 ==&gt; 0.00113665066936
+单页文件套 钮扣文件袋 ==&gt; 0.00113665066936
+网易logo报事贴 网易logo报事贴 ==&gt; 0.0035362465269
+啫喱笔 杂志筐 ==&gt; 0.00126294518818
+签字笔 双面胶 ==&gt; 0.00113665066936
+订书针 订书机 ==&gt; 0.00290477393281
+圆珠笔 笔记本 ==&gt; 0.00101035615054
+订书机 订书针 ==&gt; 0.00126294518818
+啫喱笔 固体胶 ==&gt; 0.00113665066936
+啫喱笔 自动铅笔 ==&gt; 0.00151553422581
+笔记本 透明胶 ==&gt; 0.00101035615054
+啫喱笔 钮扣文件袋 ==&gt; 0.00113665066936
+多用途笔筒 剪刀 ==&gt; 0.00101035615054
+铅笔 笔刨 ==&gt; 0.00202071230109
+白板笔 啫喱笔 ==&gt; 0.00113665066936
+圆珠笔 透明胶 ==&gt; 0.00126294518818
+透明胶 荧光笔 ==&gt; 0.00101035615054
+笔刨 橡皮 ==&gt; 0.00126294518818
+啫喱笔 橡皮 ==&gt; 0.00164182874463
+拉链文件袋 拉链文件袋 ==&gt; 0.00126294518818
+啫喱笔 网易logo报事贴 ==&gt; 0.00113665066936
+笔记本 啫喱笔 ==&gt; 0.00101035615054
+双头小记号笔 双头大记号笔 ==&gt; 0.00113665066936
+签字笔 无线装订本 ==&gt; 0.00101035615054
+裁纸刀 啫喱笔 ==&gt; 0.00101035615054
+签字笔 拍纸本 ==&gt; 0.00113665066936
+签字笔 圆珠笔 ==&gt; 0.001389239707
+双头小记号笔 手写标签 ==&gt; 0.00101035615054
+签字笔 报事贴 ==&gt; 0.00126294518818
+啫喱笔 双面胶 ==&gt; 0.00239959585754
+封箱胶 透明胶 ==&gt; 0.00126294518818
+封箱胶 剪刀 ==&gt; 0.00126294518818
+笔记本 自动铅笔 ==&gt; 0.00164182874463
+签字笔 自动铅笔 ==&gt; 0.00126294518818
+双头小记号笔 啫喱笔 ==&gt; 0.00239959585754
+啫喱笔 拍纸本 ==&gt; 0.00164182874463
+铅笔 橡皮 ==&gt; 0.00189441778227
+拉链文件袋 笔记本 ==&gt; 0.00101035615054
+啫喱笔 报事贴 ==&gt; 0.00101035615054
+单页文件套 啫喱笔 ==&gt; 0.00101035615054
+双头小记号笔 签字笔 ==&gt; 0.00126294518818
+笔记本 荧光笔 ==&gt; 0.00126294518818
+双头小记号笔 笔记本 ==&gt; 0.00113665066936
+多用途笔筒 啫喱笔 ==&gt; 0.00113665066936
+啫喱笔 透明胶 ==&gt; 0.00227330133872
+自动铅笔 橡皮 ==&gt; 0.00151553422581
+啫喱笔 海绵双面胶  ==&gt; 0.00126294518818
+裁纸刀 剪刀 ==&gt; 0.00101035615054
+签字笔 封箱胶 ==&gt; 0.001389239707
+笔记本 钮扣文件袋 ==&gt; 0.00101035615054
+双头小记号笔 拍纸本 ==&gt; 0.00113665066936
+啫喱笔 自动铅笔芯 ==&gt; 0.00151553422581
+自动铅笔 拍纸本 ==&gt; 0.00101035615054
+啫喱笔 铅笔 ==&gt; 0.00164182874463
+签字笔 荧光笔 ==&gt; 0.00189441778227
+啫喱笔 直尺 ==&gt; 0.00101035615054
+回形针 啫喱笔 ==&gt; 0.00126294518818
+笔记本 铅笔 ==&gt; 0.00101035615054
+网易logo普通便条纸 网易logo报事贴 ==&gt; 0.00340995200808
+签字笔 透明胶 ==&gt; 0.00227330133872
+笔记本 报事贴 ==&gt; 0.00126294518818
+啫喱笔 啫喱笔 ==&gt; 0.00113665066936
+双面胶 固体胶 ==&gt; 0.00126294518818
+双头大记号笔 啫喱笔 ==&gt; 0.00189441778227
+钮扣文件袋 拉链文件袋 ==&gt; 0.00164182874463
+签字笔 橡皮 ==&gt; 0.001389239707
+圆珠笔 双头小记号笔 ==&gt; 0.00101035615054
+啫喱笔 双头大记号笔 ==&gt; 0.001389239707
+封箱胶 啫喱笔 ==&gt; 0.00164182874463
+订书针 啫喱笔 ==&gt; 0.00113665066936
+笔记本 自动铅笔芯 ==&gt; 0.00151553422581
+封箱胶 钮扣文件袋 ==&gt; 0.00101035615054
+自动铅笔 自动铅笔芯 ==&gt; 0.00227330133872
+笔记本 笔记本 ==&gt; 0.00113665066936
+反尾夹 钮扣文件袋 ==&gt; 0.00113665066936
+签字笔 自动铅笔芯 ==&gt; 0.00126294518818
+签字笔 双螺笔记本 ==&gt; 0.00151553422581
+裁纸刀 封箱胶 ==&gt; 0.00176812326345
+笔记本 剪刀 ==&gt; 0.00101035615054
+圆珠笔 啫喱笔 ==&gt; 0.00227330133872
+双螺笔记本 圆珠笔 ==&gt; 0.00101035615054
+啫喱笔 网易logo普通便条纸 ==&gt; 0.00126294518818
+啫喱笔 荧光笔 ==&gt; 0.00315736297045
+剪刀 裁纸刀 ==&gt; 0.00101035615054
+签字笔 笔记本 ==&gt; 0.00101035615054
+报事贴 啫喱笔 ==&gt; 0.00113665066936
+自动铅笔芯 橡皮 ==&gt; 0.00176812326345
+回形针 固体胶 ==&gt; 0.00113665066936
+啫喱笔 封箱胶 ==&gt; 0.00164182874463
+双头小记号笔 剪刀 ==&gt; 0.00151553422581
+签字笔 剪刀 ==&gt; 0.00113665066936
+啫喱笔 剪刀 ==&gt; 0.00265218489518
+直尺 剪刀 ==&gt; 0.00113665066936
+荧光笔 固体胶 ==&gt; 0.00101035615054
+透明胶 双面胶 ==&gt; 0.00202071230109
+拉链文件袋 钮扣文件袋 ==&gt; 0.00164182874463
+笔记本 杂志筐 ==&gt; 0.00101035615054
+透明胶 固体胶 ==&gt; 0.00113665066936
+签字笔 直尺 ==&gt; 0.00101035615054
+
+Concalate Confidence
+--------------------
+71订书机 ==&gt; 72订书针 [Conf:0.741935483871]
+72订书针 ==&gt; 71订书机 [Conf:0.560975609756]
+357网易logo报事贴 ==&gt; 356网易logo报事贴 [Conf:0.736842105263]
+356网易logo报事贴 ==&gt; 357网易logo报事贴 [Conf:0.8]
+356网易logo报事贴 ==&gt; 355网易logo普通便条纸 [Conf:0.8]
+355网易logo普通便条纸 ==&gt; 356网易logo报事贴 [Conf:0.8]
+264笔记本 ==&gt; 280签字笔 [Conf:0.5]
+38笔刨 ==&gt; 35铅笔 [Conf:0.551724137931]
+57回形针盒 ==&gt; 56回形针 [Conf:0.6875]
+37自动铅笔芯 ==&gt; 36自动铅笔 [Conf:0.758620689655]
+36自动铅笔 ==&gt; 37自动铅笔芯 [Conf:0.709677419355]
+65裁纸刀 ==&gt; 63剪刀 [Conf:0.408163265306]
+357网易logo报事贴 ==&gt; 355网易logo普通便条纸 [Conf:0.710526315789]
+355网易logo普通便条纸 ==&gt; 357网易logo报事贴 [Conf:0.771428571429]
+287自动铅笔芯 ==&gt; 286自动铅笔 [Conf:0.642857142857]
+286自动铅笔 ==&gt; 287自动铅笔芯 [Conf:0.75]
+324订书针 ==&gt; 323订书机 [Conf:0.5]
+323订书机 ==&gt; 324订书针 [Conf:0.588235294118]
+34双头大记号笔 ==&gt; 43啫喱笔 [Conf:0.428571428571]
+59透明胶座 ==&gt; 58透明胶 [Conf:0.727272727273]
+38笔刨 ==&gt; 43啫喱笔 [Conf:0.413793103448]
+</code></pre>
+<p>上面有两个部分，第一个部分是计算支持度，第二个部分是计算置信度，因为文具很多是重名的，为了区分，在它们前面加了文具的id，从产生的规则上看，还是能看出来一些有意思的，比如前两个，买了钉书机的用户有74% 的概率去买订书针，而反过来，买了订书针的用户只有56%的概率买钉书机。这也符合我们的习惯：如果第一次买钉书机很有会买订书针，而当我们的订书针用完时，因为我们已经有订书机了，所以可能只需要购买订数针即可。</p>
+<p>再post一个频繁3项集规则的，支持度阈值同样为0.001，置信度规则为0.4：</p>
+<pre><code>Concalate Support
+--------------------
+笔记本 啫喱笔 啫喱笔 ==&gt; 0.00101035615054
+啫喱笔 啫喱笔 剪刀 ==&gt; 0.00126294518818
+圆珠笔 签字笔 啫喱笔 ==&gt; 0.00101035615054
+啫喱笔 自动铅笔 自动铅笔芯 ==&gt; 0.001389239707
+签字笔 透明胶 啫喱笔 ==&gt; 0.00101035615054
+啫喱笔 啫喱笔 双面胶 ==&gt; 0.00113665066936
+签字笔 啫喱笔 啫喱笔 ==&gt; 0.00227330133872
+网易logo普通便条纸 网易logo报事贴 网易logo报事贴 ==&gt; 0.00303106845163
+笔记本 自动铅笔 自动铅笔芯 ==&gt; 0.001389239707
+自动铅笔 自动铅笔芯 橡皮 ==&gt; 0.00126294518818
+啫喱笔 啫喱笔 透明胶 ==&gt; 0.00151553422581
+铅笔 笔刨 橡皮 ==&gt; 0.00101035615054
+啫喱笔 网易logo普通便条纸 网易logo报事贴 ==&gt; 0.00113665066936
+
+Concalate Confidence
+--------------------
+43啫喱笔 62剪刀 ==&gt; 42啫喱笔 [Conf:0.47619047619]
+42啫喱笔 62剪刀 ==&gt; 43啫喱笔 [Conf:0.588235294118]
+42啫喱笔 63剪刀 ==&gt; 43啫喱笔 [Conf:0.47619047619]
+37自动铅笔芯 39橡皮 ==&gt; 36自动铅笔 [Conf:0.714285714286]
+36自动铅笔 39橡皮 ==&gt; 37自动铅笔芯 [Conf:0.833333333333]
+43啫喱笔 60双面胶 ==&gt; 42啫喱笔 [Conf:0.473684210526]
+42啫喱笔 60双面胶 ==&gt; 43啫喱笔 [Conf:0.818181818182]
+282啫喱笔 356网易logo报事贴 ==&gt; 355网易logo普通便条纸 [Conf:1.0]
+282啫喱笔 355网易logo普通便条纸 ==&gt; 356网易logo报事贴 [Conf:0.9]
+43啫喱笔 37自动铅笔芯 ==&gt; 36自动铅笔 [Conf:0.75]
+43啫喱笔 36自动铅笔 ==&gt; 37自动铅笔芯 [Conf:0.75]
+58透明胶 43啫喱笔 ==&gt; 42啫喱笔 [Conf:0.6]
+42啫喱笔 58透明胶 ==&gt; 43啫喱笔 [Conf:0.666666666667]
+3笔记本 43啫喱笔 ==&gt; 42啫喱笔 [Conf:0.461538461538]
+42啫喱笔 3笔记本 ==&gt; 43啫喱笔 [Conf:0.48]
+41签字笔 43啫喱笔 ==&gt; 42啫喱笔 [Conf:0.418604651163]
+41签字笔 42啫喱笔 ==&gt; 43啫喱笔 [Conf:0.5625]
+356网易logo报事贴 357网易logo报事贴 ==&gt; 355网易logo普通便条纸 [Conf:0.857142857143]
+355网易logo普通便条纸 357网易logo报事贴 ==&gt; 356网易logo报事贴 [Conf:0.888888888889]
+355网易logo普通便条纸 356网易logo报事贴 ==&gt; 357网易logo报事贴 [Conf:0.857142857143]
+357网易logo报事贴 ==&gt; 355网易logo普通便条纸 356网易logo报事贴 [Conf:0.631578947368]
+356网易logo报事贴 ==&gt; 355网易logo普通便条纸 357网易logo报事贴 [Conf:0.685714285714]
+355网易logo普通便条纸 ==&gt; 356网易logo报事贴 357网易logo报事贴 [Conf:0.685714285714]
+42啫喱笔 37自动铅笔芯 ==&gt; 36自动铅笔 [Conf:0.6875]
+42啫喱笔 36自动铅笔 ==&gt; 37自动铅笔芯 [Conf:0.733333333333]
+2笔记本 37自动铅笔芯 ==&gt; 36自动铅笔 [Conf:0.916666666667]
+2笔记本 36自动铅笔 ==&gt; 37自动铅笔芯 [Conf:0.846153846154]
+40圆珠笔 42啫喱笔 ==&gt; 41签字笔 [Conf:0.470588235294]
+40圆珠笔 41签字笔 ==&gt; 42啫喱笔 [Conf:0.421052631579]
+38笔刨 39橡皮 ==&gt; 35铅笔 [Conf:0.8]
+35铅笔 39橡皮 ==&gt; 38笔刨 [Conf:0.533333333333]
+35铅笔 38笔刨 ==&gt; 39橡皮 [Conf:0.5]
+58透明胶 43啫喱笔 ==&gt; 41签字笔 [Conf:0.4]
+41签字笔 58透明胶 ==&gt; 43啫喱笔 [Conf:0.444444444444]
+</code></pre>
+<p>这里同样可以发现有意思的规则，例如第5条，买了自动铅笔和橡皮的，有83%的概率会买自动铅笔芯。</p>
+<p>总之利用这些规则，我们可以做些什么呢，当用户选了一个文具时，如果在我们的规则前件中，我们可以实时的把规则后件的文具的推荐给他，猜测他下一步有可能买的文具，这个听起来似乎还不错。<sup>_</sup></p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://bofeng.github.io/post/guan-lian-gui-ze-ji-ben-gai-nian/">
+                <h3 class="post-title">
+                  关联规则-基本概念
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://bofeng.github.io/images/avatar.png?v=1587158968879" class="no-responsive avatar">
+    <div class="text-muted"></div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/gnome-display-settings-enable-multiple-scales/">Gnome display settings enable multiple scales</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/array-and-pointer-in-c/">Array and Pointer in C</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/initialize-c-structure/">Initialize C Structure</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/back-pressure/">Back Pressure</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/threadinglocal-and-contextvarscontextvar/">threading.local and contextvars.ContextVar</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/starlette-quick-manual/">🌟 Starlette Quick Manual</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/deploy-poll-app-to-rocketchat/">🚀 Deploy Poll App to Rocket.chat</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/proxy-websocket-timeout/">🚁 Proxy Websocket Timeout </a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/proxy-websocket-configuration-in-apache-and-nginx/">Proxy Websocket Configuration in Apache and Nginx</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/passwd-and-shadow/">passwd &amp; shadow</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge warning">
+          linux
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge secondary">
+          ubuntu
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Xp4pUvOV9/" class="badge warning">
+          c
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/MIOrvhB7a/" class="badge success">
+          rocketchat
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/B-lE5rjJQ/" class="badge ">
+          websocket
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4mqNg88O5/" class="badge success">
+          nginx
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ldB2Nthcy/" class="badge secondary">
+          apache
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/jmsnxeb0L/" class="badge secondary">
+          webpy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dTSYjKA1x/" class="badge secondary">
+          passwd
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4NRPVT4nt/" class="badge warning">
+          godaddy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Dr03KtaXl/" class="badge success">
+          raspi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/DfdCdjQwH/" class="badge ">
+          vnc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GLhh3mgC0/" class="badge warning">
+          logroute
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Y-U7pc_rs/" class="badge secondary">
+          uwsgi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/2ldRfwlTHj/" class="badge secondary">
+          ngrok
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/N7uzveFEQ/" class="badge ">
+          flask
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/t46GgOmQJ/" class="badge ">
+          classmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/7tN2CvtD1N/" class="badge warning">
+          staticmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eSZ5lHy7P/" class="badge warning">
+          python
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/8bPDgHSAN/" class="badge warning">
+          web
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vJnENzWsf/" class="badge secondary">
+          ssl
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dnoL5D0w-/" class="badge warning">
+          mail
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/yuo6OYefk4/" class="badge secondary">
+          smtp
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GS8sncYwZ/" class="badge warning">
+          rsync
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/EXump4cPm/" class="badge secondary">
+          pypi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/LzDugb5gQm/" class="badge warning">
+          cors
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rLcaXQkmK/" class="badge secondary">
+          vim
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vLxhso05B/" class="badge secondary">
+          strace
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/IbPl9to7C/" class="badge secondary">
+          google
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/X_VKuDyUs/" class="badge secondary">
+          opensource
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/JPaKbEpxsK/" class="badge secondary">
+          license
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/0uGMCxZDs/" class="badge success">
+          mkdocs
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/K5ngz4Z3X/" class="badge warning">
+          cloudflare
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/XlycwU8qXZ/" class="badge success">
+          github
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/OLHLFT4if/" class="badge ">
+          ssh
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/AWO0Br2y4/" class="badge secondary">
+          scratch
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0PlhyDUc/" class="badge warning">
+          algorithm
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0zRGJ6aD/" class="badge ">
+          jQuery
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/3NETfISBbQ/" class="badge secondary">
+          js
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4zLHN4PXY/" class="badge ">
+          docker
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ROXx9algt/" class="badge warning">
+          opencourse
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/1KJQkim0xD/" class="badge warning">
+          course
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/-Mmbm4s8hZ/" class="badge secondary">
+          education
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/QibBEdubUA/" class="badge ">
+          chromebook
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rMdHe7zYUx/" class="badge warning">
+          iOS
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/w0rUetnyT/" class="badge secondary">
+          life
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ypaP9jx_V/" class="badge secondary">
+          hls
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ITnA4khP_/" class="badge secondary">
+          protobuf
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/5XAvbVu7Y/" class="badge success">
+          loadbalance
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/G6EOG9dUqx/" class="badge secondary">
+          server
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/v-BqS_DjJ/" class="badge secondary">
+          iPhone
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/I7SG4keW3/" class="badge secondary">
+          objc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/g_FfQMIOg/" class="badge warning">
+          memcached
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eAw-5Salr/" class="badge secondary">
+          datamining
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

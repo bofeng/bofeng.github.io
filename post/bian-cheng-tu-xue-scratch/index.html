@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>编程兔学Scratch | 0xBF</title>
+<meta name="description" content="">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://bofeng.github.io/favicon.ico?v=1587158968879">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://bofeng.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://bofeng.github.io">0xBF</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/open-source-license-flow-chart/" class="menu">
+                Open Source License
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>编程兔学Scratch</h1>
+            <p class="article-meta">
+              2015-12-29
+              
+                <a href="https://bofeng.github.io/tag/AWO0Br2y4/" class="badge warning">
+                  scratch
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <div>
+<link href='https://fonts.googleapis.com/css?family=Short+Stack' rel='stylesheet' type='text/css'>
+<style>.handwriting {font-family: "Short Stack", cursive; font-size:16px}</style>
+</div>
+<p>Today Tutu finished reading the book《Learn to Program with Scratch》, he wrote some notes:</p>
+<!-- more -->
+<div class="handwriting">
+<h3> Getting Started</h3>
+<p>Stage size is 480 x 360.<p>
+<p>You can copy blocks from one sprite to another, just drag blocks from the Sprite area of the source sprite to the thumbnail of the destination sprite in the Sprite list</p>
+<p>Costumes: a sprite can "wear" only one at a time</p>
+<p> Scratch can read only MP3 and WAV sound files</p>
+<p> Backdrop usage example: if you are creating game, you might show one backdrop with instructions to begin and then switch to another when the user starts the game</p>
+<p> The "Can drag" in player checkbox indicates whether or not the sprite can be dragged in Presentation mode</p>
+<p> In "edit" menu, choose "Turbo mode" will increase the speed of some blocks</p>
+<p> <mark>Block:</mark> [set x to [mouse x]] </p>
+<p> <mark>Block:</mark> [if touching paddle then [pick random -30 to 30]] </p>
+<p> <mark>Block:</mark> [if touching floor then [stop all]] </p>
+<p>"Pick random" block allow you input a range, Scratch will only choose values b/t the two limits *inclusive* <p>
+<h3>Motion and Drawing</h3>
+<p>"Glide to" block like "go to", but it lets you set how long the Sprite to the target position.</p>
+<p>Motion commands work with Reference to a sprite's center, so the center position is important.</p>
+<p>Scratch pointing direction: 0 is up, 90 is right, 180 is down and -90 is left.</p>
+<p>Direction for a sprite by default is 90 (right)</p>
+<p>Each sprite has an invisible pen, which can be either up or down </p>
+<p><mark>Block:</mark> [reset timer] [wait until [timer > 3]] </p>
+<p> Scratch maintains a timer that records how much time has passed since Scratch was started. When you start Scratch in a Web browser, the timer will be set to 0, and it will count up by tenths of a second as long as you keep Scratch open. The timer block (in the Sensing palette) holds the current value of the timer. The checkbox next to the block allows you to show/hide the block’s monitor on the Stage. The reset timer block resets the timer to 0, and the time starts ticking up again immediately. The timer continues to run even when the project stops running. </p>
+<p> A cloned sprite inherits the original’s state at the time it is cloned — that is, the original’s current position and direction, costume, visibility status, pen color, pen size, graphic effects, and so on.</p>
+<h3>Looks and Sound</h3>
+<p>The commands in the Looks palette will let you create animations and apply graphic effects like whirl, fisheye, ghost, and so on to costumes and backgrounds.</p>
+<p>You can use the switch backdrop to command to change scenes in a story, switch levels in a game, and so on. Any sprite in your project can use the when backdrop switches to block to detect when the Stage has switched to a certain costume and act accordingly.</p>
+<p> Change layer's z-index: "go to front" (always draw a sprite on top) and "go back layers".</p>
+<p>You can add background music to your application by playing an audio file repeatedly. The easiest way to do this is to use play sound until done to let the file to play completely, and then restart it.</p>
+<p>Tempo is measured in beats per minute (bpm). The higher the tempo, the faster the notes and drums will play.</p>
+<h3>Procedures</h3>
+<p>You can create your own custom blocks. After you make a custom block, it should appear in the More Blocks palette, where you can use it as you would any other Scratch block.</p>
+<p> When you define customized block, there is an option called "Run without screen refresh", if you selected it, the blocks will run without pausing to refresh the screen, allowing the procedure to run much faster. The screen will refresh after Scratch executes the entire procedure.</p>
+<p> You can have one procedure call another procedure (nested procedure).</p>
+<p> In Scratch, different data type has different block shape, for example, numbers are rectangle with rounded corner, strings rectangle with shape corner.</p>
+<p> Scratch automatically tries to convert b/t data types as needed.</p>
+<p> When creating a variable, Choosing For this sprite only creates a variable that can be changed only by the sprite that owns it. Other sprites can still read and use the variable’s value, but they can’t write to it.</p>
+<p> If scratch tries to convert a string to number, for example, "blahblah" to number, it will fail, however, rather than showing an error msg, Scratch will silently set the converted value to be 0.</p>
+<p> <mark>Cloud Variable:</mark> Anyone who views a project you’ve shared on the Scratch website can read the cloud variables in the project. For example, if you share a game, you can use a cloud variable to track the highest score recorded among all the players. The score cloud variable should update almost immediately for everyone interacting with your game. Because these variables are stored on Scratch servers, they keep their value even if you exit your browser. Cloud variables make it easy to create surveys and other projects that store numbers over time. </p>
+<p> <mark>Variables and Clone:</mark> Every sprite has a list of properties associated with it, including its current x-position, y-position, direction, and so on. You can imagine that list as a backpack holding the current values of the sprite’s attributes. When you create a variable for a sprite with a scope of For this sprite only, that variable gets added to the sprite’s backpack. When you clone a sprite, the clone inherits copies of the parent sprite’s attributes, including its variables. An inherited property starts out identical to the parent’s property at the time the clone is created. But after that, if the clone’s attributes and variables change, those changes don’t affect the parent. Subsequent changes to the parent sprite don’t affect the clone’s properties, either.</p>
+<p> A variable's monitor can have different types: normal readout (default), large readout, and slider control</p>
+<p> A variable’s monitor also indicates its scope. If a variable belongs to one sprite, its monitor should show the sprite name before the variable name. For example, the monitor Cat speed 0 indicates that speed belongs to Cat. If the speed variable were a global variable, its monitor would only say speed 0. </p>
+<p> The "Light" sprite executes the "set ghost effect to" command to change its transparency level to simulate visual effect like a actual bulb.</p>
+<p> <mark>Block:</mark> for user input, [ask and wait] </p>
+<p>After executing the ask and wait command, the calling script waits for the user to press the ENTER key or click the check mark at the right side of the input box. When this happens, Scratch stores the user’s input in the answer block and continues execution at the command immediately after the ask and wait block.</p>
+<p> <mark>Block:</mark> Use [join] block to concatenate strings.</p>
+<h3> Making Decisions</h3>
+<p> Check my color sensor game:</p>
+<iframe allowtransparency="true" width="485" height="402" src="https://scratch.mit.edu/projects/embed/92807707/?autostart=false" frameborder="0" allowfullscreen></iframe>
+<p>https://scratch.mit.edu/projects/embed/92807707/?autostart=false</p>
+<p> <mark>Idea:</mark> Play Rock, Paper, Scissors game against the computer. The player makes a selection by clicking one of three buttons that represent rock, paper, or scissors. The computer makes a random selection. The winner is selected according to the following rules: Paper beats (wraps) rock, rock beats (breaks) scissors, and scissors beat (cut) paper. </p>
+<h3> Repetition </h3>
+<p> Procedures that can call themselves with recursion. </p>
+<p> Use [stop] block to end active scripts: 1, stop this script: stop the script that invoked this block 2, stop all: stop all scripts in the applicaiton 3, stop other scripts in sprite: stop all scripts in a sprite except the one that invoked this block </p>
+<h3> String Processing </h3>
+<p><mark>Block:</mark> [letter [] of []], in Scratch, string's index starts from 1, not 0.</p>
+<p><mark>Idea:</mark> Counts how many vowels are in an input string. </p>
+<p>Scratch's string could be multi-byte character, like Chinese, "letter 1 of Chinese sentence" will show first Chinese character correctly.</p>
+<p><mark>Idea:</mark> Check if a string is palindrome.</p>
+<p>In Scratch, you can't alter the characters in a string, so the only way to change a string is to create a new one. </p>
+<p><mark>Idea:</mark> Binary to decimal converter.</p>
+<h3> Lists </h3>
+<p>A list is like a container where you can store and access multiple values. You can think of it as a dresser with many drawers, with each drawer storing a single item. When you create a list, you name it just as you would a variable.</p>
+<p>List's index starts from 1, not 0, like string </p>
+<p>List supported functions: add, delete , insert, replace, contains, item at index, length </p>
+<p> Trying to access an element past the boundaries of a list is, technically, an error. Rather than display an error message or abruptly terminate your program, however, Scratch silently tries to do something sensible with the offending block, for example, access out-of-range index, Scratch will return empty. Insert or delete element at out-of-range index, Scratch will ignore this command.</p>
+<p><mark>Idea:</mark> Ask user to input number to a list, then find the min, max and average; search and sorting; find median.</p>
+<p><mark>Idea:</mark> Math Wizard, US Map Quiz</p>
+</div>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://bofeng.github.io/post/start-service-upon-rebooting-ubuntu/">
+                <h3 class="post-title">
+                  Start service upon rebooting ubuntu
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://bofeng.github.io/images/avatar.png?v=1587158968879" class="no-responsive avatar">
+    <div class="text-muted"></div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/gnome-display-settings-enable-multiple-scales/">Gnome display settings enable multiple scales</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/array-and-pointer-in-c/">Array and Pointer in C</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/initialize-c-structure/">Initialize C Structure</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/back-pressure/">Back Pressure</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/threadinglocal-and-contextvarscontextvar/">threading.local and contextvars.ContextVar</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/starlette-quick-manual/">🌟 Starlette Quick Manual</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/deploy-poll-app-to-rocketchat/">🚀 Deploy Poll App to Rocket.chat</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/proxy-websocket-timeout/">🚁 Proxy Websocket Timeout </a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/proxy-websocket-configuration-in-apache-and-nginx/">Proxy Websocket Configuration in Apache and Nginx</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/passwd-and-shadow/">passwd &amp; shadow</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge secondary">
+          linux
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge success">
+          ubuntu
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Xp4pUvOV9/" class="badge secondary">
+          c
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/MIOrvhB7a/" class="badge ">
+          rocketchat
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/B-lE5rjJQ/" class="badge secondary">
+          websocket
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4mqNg88O5/" class="badge secondary">
+          nginx
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ldB2Nthcy/" class="badge secondary">
+          apache
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/jmsnxeb0L/" class="badge success">
+          webpy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dTSYjKA1x/" class="badge warning">
+          passwd
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4NRPVT4nt/" class="badge secondary">
+          godaddy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Dr03KtaXl/" class="badge secondary">
+          raspi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/DfdCdjQwH/" class="badge secondary">
+          vnc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GLhh3mgC0/" class="badge ">
+          logroute
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Y-U7pc_rs/" class="badge success">
+          uwsgi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/2ldRfwlTHj/" class="badge secondary">
+          ngrok
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/N7uzveFEQ/" class="badge secondary">
+          flask
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/t46GgOmQJ/" class="badge warning">
+          classmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/7tN2CvtD1N/" class="badge secondary">
+          staticmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eSZ5lHy7P/" class="badge secondary">
+          python
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/8bPDgHSAN/" class="badge ">
+          web
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vJnENzWsf/" class="badge secondary">
+          ssl
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dnoL5D0w-/" class="badge secondary">
+          mail
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/yuo6OYefk4/" class="badge success">
+          smtp
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GS8sncYwZ/" class="badge success">
+          rsync
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/EXump4cPm/" class="badge ">
+          pypi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/LzDugb5gQm/" class="badge secondary">
+          cors
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rLcaXQkmK/" class="badge success">
+          vim
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vLxhso05B/" class="badge ">
+          strace
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/IbPl9to7C/" class="badge secondary">
+          google
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/X_VKuDyUs/" class="badge secondary">
+          opensource
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/JPaKbEpxsK/" class="badge ">
+          license
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/0uGMCxZDs/" class="badge secondary">
+          mkdocs
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/K5ngz4Z3X/" class="badge secondary">
+          cloudflare
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/XlycwU8qXZ/" class="badge warning">
+          github
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/OLHLFT4if/" class="badge warning">
+          ssh
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/AWO0Br2y4/" class="badge ">
+          scratch
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0PlhyDUc/" class="badge success">
+          algorithm
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0zRGJ6aD/" class="badge secondary">
+          jQuery
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/3NETfISBbQ/" class="badge secondary">
+          js
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4zLHN4PXY/" class="badge secondary">
+          docker
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ROXx9algt/" class="badge secondary">
+          opencourse
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/1KJQkim0xD/" class="badge success">
+          course
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/-Mmbm4s8hZ/" class="badge secondary">
+          education
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/QibBEdubUA/" class="badge secondary">
+          chromebook
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rMdHe7zYUx/" class="badge secondary">
+          iOS
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/w0rUetnyT/" class="badge secondary">
+          life
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ypaP9jx_V/" class="badge warning">
+          hls
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ITnA4khP_/" class="badge ">
+          protobuf
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/5XAvbVu7Y/" class="badge warning">
+          loadbalance
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/G6EOG9dUqx/" class="badge ">
+          server
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/v-BqS_DjJ/" class="badge secondary">
+          iPhone
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/I7SG4keW3/" class="badge success">
+          objc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/g_FfQMIOg/" class="badge success">
+          memcached
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eAw-5Salr/" class="badge success">
+          datamining
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

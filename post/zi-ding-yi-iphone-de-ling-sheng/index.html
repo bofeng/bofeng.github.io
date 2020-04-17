@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>自定义iPhone的铃声 | 0xBF</title>
+<meta name="description" content="">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://bofeng.github.io/favicon.ico?v=1587158968879">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://bofeng.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://bofeng.github.io">0xBF</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/open-source-license-flow-chart/" class="menu">
+                Open Source License
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>自定义iPhone的铃声</h1>
+            <p class="article-meta">
+              2011-04-18
+              
+                <a href="https://bofeng.github.io/tag/v-BqS_DjJ/" class="badge ">
+                  iPhone
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p>我低端了，用了iPhone一年了，才学会怎么换铃声。之前网上就有说，每次大家聚餐吃饭，听到xxx的铃声，就有一群人拿出自己的ip看，可见低端又不会换铃声的不在少数（实际上也确实麻烦），一般手机很容易做的功能，在iPhone上就不会很容易，比如备份或者全部清空通讯录；但毕竟iphone的魅力就在于有太多其它手机根本做不了的功能。</p>
+<!-- more -->
+<p>切回正题，准备工作：需要iTunes，需要会重命名文件。。。（<em>——</em>）</p>
+<p>第一步，打开iTunes，找到一首你想转做铃声的歌曲。点击右键。</p>
+<figure data-type="image" tabindex="1"><img src="https://ws4.sinaimg.cn/large/006tKfTcgy1fmxkecx0rpj30nd0e5gpw.jpg" alt="step1" loading="lazy"></figure>
+<p>第二步，在弹出菜单里选择“Get Info”，如果是中文版应该是“获取简介”什么的。然后在弹出的“简介”框里点击上面的“Options”（选项），然后就会出现下面的界面：</p>
+<figure data-type="image" tabindex="2"><img src="https://ws4.sinaimg.cn/large/006tKfTcgy1fmxkfx68r6j30g70euq4a.jpg" alt="step2" loading="lazy"></figure>
+<p>然后在中间有一个Start Time和Stop Time，勾选好这两个地方，然后把时间调成你想当作手机铃声的那段歌曲的起止时间，例如你喜欢一首歌的前奏，可能是前20秒，就把start time调成0:00，把stop time调成0:20 ~ 选好时间后点“OK” （注意，作为iphone铃声这里不能太长，你可能想用这首歌，但是太长的话是不支持导入的，这里建议时间截取在30秒内）</p>
+<p>第三步，回到你选择的这首歌，再点击右键，选择“Create AAC Version”（创建AAC版本）。然后iTunes就会在你选择的这个歌曲文件下，生成一个新的歌曲文件。时间长度就是在第二步中截取的长度。</p>
+<figure data-type="image" tabindex="3"><img src="https://ws1.sinaimg.cn/large/006tKfTcgy1fmxkgdaakpj30hy0co40p.jpg" alt="step3" loading="lazy"></figure>
+<p>第四步，选择新创建好的这个文件，点击右键，选择”Show in Finder“（在Finder中显示），如果是windows版本的iTunes，应该是“在windows资源管理器中显示”。然后会弹出一个窗口，显示刚刚创建好的那个文件。这时这个文件的后缀名应该是m4a，复制这个文件到你的桌面（或者其它地方也行，在下一步操作中你能找到它就号），复制完后更改这个文件的后缀名，改为m4r。</p>
+<p>第五步，回到你的iTunes，再点击在第二步中生成的那个比较短版本的歌曲文件，右键-&gt;”Delete”（删除）它。然后看你的iTunes的顶层操作菜单，选择“File” -&gt; “Add to library” （文件-》将文件导入到库），然后会弹出框让你选择要导入的文件，这时选择你在第四步中的那个m4r文件。</p>
+<figure data-type="image" tabindex="4"><img src="https://ws1.sinaimg.cn/large/006tKfTcgy1fmxkguo515j30g50b2jua.jpg" alt="step5" loading="lazy"></figure>
+<p>都完成后，如果不出意外的话，在你iTunes侧边栏会多出一个“Ringtones”（铃声）项。（如上图所示，在最左边的导航项依次为Music, Movies, TV Shows, Podcasts, Apps, Ringtones, Radio，没错，就是这个Ringtone。点击Ringtones（铃声），就会看到你新导入的这个铃声文件了。</p>
+<p>第六步，连上你的iPhone，在iTunes的同步面板中点击“铃声”选项卡，选择“同步所有铃声”或者“同步所选择的铃声”，就可以勾选到你新生成的这个铃声文件了。同步完成后，从iPhone里打开“设置”-》“声音”-》“铃声”，就可以看到新同步的铃声啦。</p>
+<p>够折腾吧。</p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://bofeng.github.io/post/objcs-self-and-super/">
+                <h3 class="post-title">
+                  objc’s self and super
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://bofeng.github.io/images/avatar.png?v=1587158968879" class="no-responsive avatar">
+    <div class="text-muted"></div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/gnome-display-settings-enable-multiple-scales/">Gnome display settings enable multiple scales</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/array-and-pointer-in-c/">Array and Pointer in C</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/initialize-c-structure/">Initialize C Structure</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/back-pressure/">Back Pressure</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/threadinglocal-and-contextvarscontextvar/">threading.local and contextvars.ContextVar</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/starlette-quick-manual/">🌟 Starlette Quick Manual</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/deploy-poll-app-to-rocketchat/">🚀 Deploy Poll App to Rocket.chat</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/proxy-websocket-timeout/">🚁 Proxy Websocket Timeout </a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/proxy-websocket-configuration-in-apache-and-nginx/">Proxy Websocket Configuration in Apache and Nginx</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/passwd-and-shadow/">passwd &amp; shadow</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge warning">
+          linux
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge success">
+          ubuntu
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Xp4pUvOV9/" class="badge success">
+          c
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/MIOrvhB7a/" class="badge success">
+          rocketchat
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/B-lE5rjJQ/" class="badge secondary">
+          websocket
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4mqNg88O5/" class="badge secondary">
+          nginx
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ldB2Nthcy/" class="badge warning">
+          apache
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/jmsnxeb0L/" class="badge secondary">
+          webpy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dTSYjKA1x/" class="badge secondary">
+          passwd
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4NRPVT4nt/" class="badge secondary">
+          godaddy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Dr03KtaXl/" class="badge ">
+          raspi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/DfdCdjQwH/" class="badge secondary">
+          vnc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GLhh3mgC0/" class="badge secondary">
+          logroute
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Y-U7pc_rs/" class="badge ">
+          uwsgi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/2ldRfwlTHj/" class="badge secondary">
+          ngrok
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/N7uzveFEQ/" class="badge ">
+          flask
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/t46GgOmQJ/" class="badge success">
+          classmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/7tN2CvtD1N/" class="badge secondary">
+          staticmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eSZ5lHy7P/" class="badge success">
+          python
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/8bPDgHSAN/" class="badge secondary">
+          web
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vJnENzWsf/" class="badge secondary">
+          ssl
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dnoL5D0w-/" class="badge secondary">
+          mail
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/yuo6OYefk4/" class="badge secondary">
+          smtp
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GS8sncYwZ/" class="badge ">
+          rsync
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/EXump4cPm/" class="badge ">
+          pypi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/LzDugb5gQm/" class="badge warning">
+          cors
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rLcaXQkmK/" class="badge secondary">
+          vim
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vLxhso05B/" class="badge warning">
+          strace
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/IbPl9to7C/" class="badge warning">
+          google
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/X_VKuDyUs/" class="badge success">
+          opensource
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/JPaKbEpxsK/" class="badge warning">
+          license
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/0uGMCxZDs/" class="badge ">
+          mkdocs
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/K5ngz4Z3X/" class="badge secondary">
+          cloudflare
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/XlycwU8qXZ/" class="badge success">
+          github
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/OLHLFT4if/" class="badge secondary">
+          ssh
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/AWO0Br2y4/" class="badge warning">
+          scratch
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0PlhyDUc/" class="badge secondary">
+          algorithm
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0zRGJ6aD/" class="badge warning">
+          jQuery
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/3NETfISBbQ/" class="badge secondary">
+          js
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4zLHN4PXY/" class="badge secondary">
+          docker
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ROXx9algt/" class="badge warning">
+          opencourse
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/1KJQkim0xD/" class="badge ">
+          course
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/-Mmbm4s8hZ/" class="badge success">
+          education
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/QibBEdubUA/" class="badge success">
+          chromebook
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rMdHe7zYUx/" class="badge ">
+          iOS
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/w0rUetnyT/" class="badge secondary">
+          life
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ypaP9jx_V/" class="badge secondary">
+          hls
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ITnA4khP_/" class="badge success">
+          protobuf
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/5XAvbVu7Y/" class="badge secondary">
+          loadbalance
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/G6EOG9dUqx/" class="badge secondary">
+          server
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/v-BqS_DjJ/" class="badge warning">
+          iPhone
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/I7SG4keW3/" class="badge success">
+          objc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/g_FfQMIOg/" class="badge warning">
+          memcached
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eAw-5Salr/" class="badge warning">
+          datamining
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

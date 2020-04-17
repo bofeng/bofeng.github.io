@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Flask Essentials For Web Developer | 0xBF</title>
+<meta name="description" content="">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://bofeng.github.io/favicon.ico?v=1587158968879">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://bofeng.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://bofeng.github.io">0xBF</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/open-source-license-flow-chart/" class="menu">
+                Open Source License
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>Flask Essentials For Web Developer</h1>
+            <p class="article-meta">
+              2018-09-27
+              
+                <a href="https://bofeng.github.io/tag/N7uzveFEQ/" class="badge secondary">
+                  flask
+                </a>
+              
+                <a href="https://bofeng.github.io/tag/eSZ5lHy7P/" class="badge success">
+                  python
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p>Python's web framework is quite similar to each other, thanks to the WSGI standard, so the first time when you learn a new Python web development framework, there are a few essential things you should know, and those will help you to get started fast.</p>
+<!-- more -->
+<h2 id="1-read-parameter-from-query-string">1, Read parameter from Query String:</h2>
+<pre><code class="language-python">from flask import request
+searchword = request.args.get(&quot;key&quot;)
+</code></pre>
+<h2 id="2-read-parameter-from-post-body">2, Read parameter from post body</h2>
+<pre><code class="language-python">from flask import request
+username = request.form.get(&quot;username&quot;)
+</code></pre>
+<h2 id="3-read-uploading-file-content-from-form-body">3, Read uploading file content from form body</h2>
+<pre><code class="language-python">from flask import request
+f = request.files['the_file']
+content = f.read()
+print(f.content_type)
+print(f.mimetype)
+print(f.name)
+print(f.filename)
+</code></pre>
+<p>File object reference: <a href="http://werkzeug.pocoo.org/docs/0.14/datastructures/#werkzeug.datastructures.FileStorage">Data Structures - Werkzeug Documentation (0.14)</a></p>
+<h2 id="4-return-a-response">4, Return a response</h2>
+<p>Directly return rendered string:</p>
+<pre><code class="language-python">def handler():
+	page_content = render_template(&quot;home.html&quot;)
+	return page_content
+</code></pre>
+<p>Return a pre-made response object</p>
+<pre><code class="language-python">from flask import make_response
+
+def handler():
+	page_content = render_template(&quot;home.html&quot;)
+	resp = make_response(page_content, 200)
+	resp.headers[&quot;x-key&quot;] = &quot;value&quot;
+	return resp
+</code></pre>
+<h2 id="5-get-set-cookie">5, Get &amp; Set Cookie:</h2>
+<p>Get Cookie:</p>
+<pre><code class="language-python">from flask import request
+
+# get cookie example
+def handler():
+	username = request.cookies.get('username')
+</code></pre>
+<p>Set Cookie:</p>
+<pre><code class="language-python">from flask import make_response
+
+def handler():
+	resp = make_response(render_template(&quot;home.html&quot;))
+	resp.set_cookie('username', 'the username')
+	return resp
+</code></pre>
+<h2 id="6-redirect">6, Redirect</h2>
+<h3 id="301-move-permanently">301: Move permanently</h3>
+<p>Use this one if one of url is permanently moved to another location</p>
+<pre><code class="language-python">from flask import redirect
+def handler():
+	return redirect(&quot;/some-url&quot;, 301)
+</code></pre>
+<h3 id="302-found">302: Found</h3>
+<pre><code class="language-python">from flask import redirect
+def handler():
+	return redirect(&quot;/some-url&quot;, 302)
+</code></pre>
+<h3 id="303-see-other-most-common">303: See other (most common)</h3>
+<p>Use this in the scenario that after user posted some data, system wants to redirect this user to get another page url</p>
+<pre><code class="language-python">from flask import redirect
+def handler():
+	return redirect(&quot;/some-url&quot;, 303)
+</code></pre>
+<h2 id="7-return-response-with-status-code">7, Return response with status code</h2>
+<pre><code class="language-python"># use an extra returned value as status code
+def handler():
+	page_content = render_template('error.html')
+	return page_content, 404
+</code></pre>
+<h2 id="8-return-response-with-custom-headers">8, Return response with custom headers</h2>
+<pre><code class="language-python"># use an extra returned value (second or third) as header
+def handler():
+	page_content = render_template(&quot;home.html&quot;)
+	headers = {
+		&quot;x-extra-key&quot;: &quot;value&quot;
+	}
+	return page_content, headers
+	# or
+	return page_content, 200, headers
+</code></pre>
+<h2 id="9-sessions">9, Sessions</h2>
+<p>Flask's built-in session will save session info into user's client side (into cookie) after encrypting it, so the app need to specify a secret_key used for encryption.<br>
+DO NOT give this key to any one! It should only be saved in the server side.</p>
+<pre><code class="language-python">from flask import Flask, session, redirect
+
+app = Flask(__name__)
+
+# Set the secret key to some random bytes. Keep this really secret!
+# generate a good secret key:
+# $ python -c 'import os; print(os.urandom(16))'
+app.secret_key = b'some-secret-key-for-encrypting-session-data'
+
+def handler():
+	if 'username' not in session:
+		return &quot;sign-in required&quot;
+	session['username'] = &quot;some username&quot;
+	return redirect(&quot;/home&quot;, 303)
+</code></pre>
+<h2 id="10-request-context">10, Request context</h2>
+<pre><code class="language-python">from flask import request
+
+def handler():
+	print(dir(request))
+
+# here are some attributes might be commonly used
+request.base_url
+request.blueprint
+request.endpoint
+request.environ
+request.full_path
+request.headers
+request.host
+request.host_url
+request.is_secure
+request.is_xhr
+request.method
+request.mimetype
+request.path
+request.query_string
+request.referrer
+request.remote_addr
+request.scheme
+request.url
+request.url_root
+request.user_agent
+</code></pre>
+<p>Additionally, the <code>request.environ</code> is a dictionary, looks like this:</p>
+<pre><code class="language-json">{
+	'wsgi.version': (1, 0), 
+	'wsgi.url_scheme': 'http', 
+	// ...
+	'SERVER_SOFTWARE': 'Werkzeug/0.14.1', 
+	'REQUEST_METHOD': 'GET', 
+	'SCRIPT_NAME': '', 
+	'PATH_INFO': '/', 
+	'QUERY_STRING': '', 
+	'REMOTE_ADDR': '127.0.0.1', 
+	'REMOTE_PORT': 64636, 
+	'SERVER_NAME': '127.0.0.1', 
+	'SERVER_PORT': '3333', 
+	'SERVER_PROTOCOL': 'HTTP/1.1', 
+	'HTTP_HOST': '127.0.0.1:3333', 
+	'HTTP_CONNECTION': 'keep-alive', 
+	'HTTP_CACHE_CONTROL': 'max-age=0', 
+	'HTTP_UPGRADE_INSECURE_REQUESTS': '1', 
+	'HTTP_USER_AGENT': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0)',
+	'HTTP_DNT': '1', 
+	'HTTP_ACCEPT': 'text/html,image/apng,*/*;q=0.8', 
+	'HTTP_ACCEPT_ENCODING': 'gzip, deflate, br', 
+	'HTTP_ACCEPT_LANGUAGE': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;', 
+	'werkzeug.request': &lt;Request '&lt;http://127.0.0.1:3333/&gt;' [GET]&gt;
+}
+</code></pre>
+<p><code>request.headers</code> is also a dictionary, for example:</p>
+<pre><code class="language-json">{
+	&quot;Host&quot;: &quot;127.0.0.1:3333&quot;,
+	&quot;Connection&quot;: &quot;keep-alive&quot;,
+	&quot;Cache-Control&quot;: &quot;max-age=0&quot;,
+	&quot;Upgrade-Insecure-Requests&quot;: &quot;1&quot;,
+	&quot;User-Agent&quot;: &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36&quot;,
+	&quot;Dnt&quot;: &quot;1&quot;,
+	&quot;Accept&quot;: &quot;text/html,application/xhtml+xml,application/xml;&quot;,
+	&quot;Accept-Encoding&quot;: &quot;gzip, deflate, br&quot;,
+	&quot;Accept-Language: en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7,zh-TW;q=0.6&quot;
+}
+</code></pre>
+<h2 id="11-logging">11, Logging</h2>
+<pre><code class="language-python">from flask import current_app
+
+current_app.logger.debug('A value for debugging')
+current_app.logger.warning('A warning occurred (%d apples)', 42)
+current_app.logger.error('An error occurred')
+</code></pre>
+<h2 id="12-flask-internal-config-value">12, Flask Internal Config Value</h2>
+<p>Configuration Handling - Flask 1.0.2 documentation</p>
+<ul>
+<li>ENV</li>
+<li>DEBUG</li>
+<li>SECRET_KEY</li>
+<li>SESSION_COOKIE_NAME</li>
+<li>SESSION_COOKIE_DOMAIN</li>
+<li>SESSION_COOKIE_PATH</li>
+<li>SESSION_COOKIE_HTTPONLY</li>
+<li>SESSION_COOKIE_SECURE</li>
+<li>PERMANENT_SESSION_LIFETIME: set cookie expire time</li>
+<li>TEMPLATES_AUTO_RELOAD</li>
+</ul>
+<h2 id="13-jinja-autoescaping">13, Jinja Autoescaping</h2>
+<p>By default, Flask's render_template will auto escape all variables in jinja templates, if you want to unescape a variable, here are 2 ways:</p>
+<p>1, use <code>|safe</code>:</p>
+<pre><code class="language-html">{{ myvariable|safe }}
+</code></pre>
+<p>2, use <code>autoescape</code> block:</p>
+<pre><code class="language-html">{% autoescape false %}
+    &lt;p&gt;autoescaping is disabled here
+    &lt;p&gt;{{ will_not_be_escaped }}&lt;/p&gt;
+{% endautoescape %}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://bofeng.github.io/post/shi-yong-lets-encrypt-ti-gong-de-mian-fei-ssl/">
+                <h3 class="post-title">
+                  使用Let&#39;s Encrypt提供的免费SSL
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://bofeng.github.io/images/avatar.png?v=1587158968879" class="no-responsive avatar">
+    <div class="text-muted"></div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/gnome-display-settings-enable-multiple-scales/">Gnome display settings enable multiple scales</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/array-and-pointer-in-c/">Array and Pointer in C</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/initialize-c-structure/">Initialize C Structure</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/back-pressure/">Back Pressure</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/threadinglocal-and-contextvarscontextvar/">threading.local and contextvars.ContextVar</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/starlette-quick-manual/">🌟 Starlette Quick Manual</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/deploy-poll-app-to-rocketchat/">🚀 Deploy Poll App to Rocket.chat</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/proxy-websocket-timeout/">🚁 Proxy Websocket Timeout </a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/proxy-websocket-configuration-in-apache-and-nginx/">Proxy Websocket Configuration in Apache and Nginx</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/passwd-and-shadow/">passwd &amp; shadow</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge secondary">
+          linux
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge ">
+          ubuntu
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Xp4pUvOV9/" class="badge warning">
+          c
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/MIOrvhB7a/" class="badge secondary">
+          rocketchat
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/B-lE5rjJQ/" class="badge success">
+          websocket
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4mqNg88O5/" class="badge secondary">
+          nginx
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ldB2Nthcy/" class="badge ">
+          apache
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/jmsnxeb0L/" class="badge secondary">
+          webpy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dTSYjKA1x/" class="badge ">
+          passwd
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4NRPVT4nt/" class="badge secondary">
+          godaddy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Dr03KtaXl/" class="badge secondary">
+          raspi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/DfdCdjQwH/" class="badge ">
+          vnc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GLhh3mgC0/" class="badge warning">
+          logroute
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Y-U7pc_rs/" class="badge secondary">
+          uwsgi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/2ldRfwlTHj/" class="badge ">
+          ngrok
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/N7uzveFEQ/" class="badge secondary">
+          flask
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/t46GgOmQJ/" class="badge success">
+          classmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/7tN2CvtD1N/" class="badge ">
+          staticmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eSZ5lHy7P/" class="badge success">
+          python
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/8bPDgHSAN/" class="badge success">
+          web
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vJnENzWsf/" class="badge secondary">
+          ssl
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dnoL5D0w-/" class="badge secondary">
+          mail
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/yuo6OYefk4/" class="badge warning">
+          smtp
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GS8sncYwZ/" class="badge warning">
+          rsync
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/EXump4cPm/" class="badge ">
+          pypi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/LzDugb5gQm/" class="badge warning">
+          cors
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rLcaXQkmK/" class="badge success">
+          vim
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vLxhso05B/" class="badge warning">
+          strace
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/IbPl9to7C/" class="badge success">
+          google
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/X_VKuDyUs/" class="badge secondary">
+          opensource
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/JPaKbEpxsK/" class="badge warning">
+          license
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/0uGMCxZDs/" class="badge warning">
+          mkdocs
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/K5ngz4Z3X/" class="badge success">
+          cloudflare
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/XlycwU8qXZ/" class="badge success">
+          github
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/OLHLFT4if/" class="badge success">
+          ssh
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/AWO0Br2y4/" class="badge warning">
+          scratch
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0PlhyDUc/" class="badge secondary">
+          algorithm
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0zRGJ6aD/" class="badge success">
+          jQuery
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/3NETfISBbQ/" class="badge secondary">
+          js
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4zLHN4PXY/" class="badge ">
+          docker
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ROXx9algt/" class="badge ">
+          opencourse
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/1KJQkim0xD/" class="badge success">
+          course
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/-Mmbm4s8hZ/" class="badge success">
+          education
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/QibBEdubUA/" class="badge ">
+          chromebook
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rMdHe7zYUx/" class="badge warning">
+          iOS
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/w0rUetnyT/" class="badge ">
+          life
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ypaP9jx_V/" class="badge success">
+          hls
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ITnA4khP_/" class="badge secondary">
+          protobuf
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/5XAvbVu7Y/" class="badge warning">
+          loadbalance
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/G6EOG9dUqx/" class="badge secondary">
+          server
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/v-BqS_DjJ/" class="badge ">
+          iPhone
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/I7SG4keW3/" class="badge ">
+          objc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/g_FfQMIOg/" class="badge ">
+          memcached
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eAw-5Salr/" class="badge warning">
+          datamining
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

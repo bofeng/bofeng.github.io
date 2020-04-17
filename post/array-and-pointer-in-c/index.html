@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Array and Pointer in C | 0xBF</title>
+<meta name="description" content="">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://bofeng.github.io/favicon.ico?v=1587158968879">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://bofeng.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://bofeng.github.io">0xBF</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/open-source-license-flow-chart/" class="menu">
+                Open Source License
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>Array and Pointer in C</h1>
+            <p class="article-meta">
+              2020-04-04
+              
+                <a href="https://bofeng.github.io/tag/Xp4pUvOV9/" class="badge secondary">
+                  c
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <h3 id="array-is-and-is-not-a-pointer">Array is and is not a pointer</h3>
+<p>Is array a pointer in C? seems we can treat it as a pointer when we access its element. But sometimes Array has different behavior from pointer.</p>
+<p>Take this for example:</p>
+<pre><code class="language-c">int main() {
+    int arr[10] = {0};
+    printf(&quot;size: %ld&quot;, sizeof(arr));
+    return 0;
+}
+</code></pre>
+<p>If <code>arr</code> here is a pointer, then seems this should print out the size of a pointer (4 or 8, depends on the Operating System), but if we compile this code, it prints out 40, so clearly it is <code>sizeof(int) * 10</code>.</p>
+<p>I like the quote here:</p>
+<blockquote>
+<p>The first step to learning C is understanding that pointers and arrays are the same thing. The second step is understanding that pointers and arrays are different.</p>
+</blockquote>
+<h3 id="pass-array-as-parameter-to-function">Pass array as parameter to function</h3>
+<p>Ok, from this <code>sizeof</code> at least we know they are different, but how do we explain this:</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+void func(int arr[]) {
+    size_t size = sizeof(arr);
+    printf(&quot;Inside func: %ld\n&quot;, size);
+}
+
+int main() {
+    int arr[10] = {0};
+    size_t size = sizeof(arr);
+    printf(&quot;Inside main: %ld\n&quot;, size);
+    func(arr);
+    return 0;
+}
+</code></pre>
+<p>We passed <code>arr</code> as parameter to function <code>func</code>, if we compile and run this program, it prints out:</p>
+<pre><code>Inside main: 40
+Inside func: 8
+</code></pre>
+<p>Well, although we set the parameter type to be <code>arr[]</code> in function <code>func</code>, but inside the function, <code>arr</code> behaves like a pointer now (it prints 8, instead of 40). So what's the magic here? we call the same <code>sizeof</code> function, why inside main function it prints out 40, and inside <code>func</code>, it prints 8?</p>
+<p>This problem bothered me for a while, I decide to check the generate assembly code to see what's the difference for these 2 <code>sizeof</code> call.</p>
+<pre><code class="language-bash">$ gcc -S -fverbose-asm main.c
+</code></pre>
+<p>A file <code>main.s</code> is generated, open this file, first let's check the <code>sizeof</code> inside main function:</p>
+<pre><code class="language-assembly"># main.c:10:     int arr[10] = {0};
+    movq    $0, -48(%rbp)   #, arr
+    movq    $0, -40(%rbp)   #, arr
+    movq    $0, -32(%rbp)   #, arr
+    movq    $0, -24(%rbp)   #, arr
+    movq    $0, -16(%rbp)   #, arr
+# main.c:11:     size_t size = sizeof(arr);
+    movq    $40, -56(%rbp)  #, size
+</code></pre>
+<p>Here the <code>movq</code> is move 8 bytes command. We can see after we defined <code>arr</code>, it first moved 8 bytes for 5 times from the <code>arr</code> address, then for our <code>sizeof</code> call, the compiler immediately set the size to be 40. Ha, so this size would be already set during the compile time, not at run time! The compiler knows <code>arr</code> here is an array's base address, it knows the array's size.</p>
+<p>But the <code>sizeof</code> call in <code>func</code> function gave us 8, its assembly code:</p>
+<pre><code class="language-assembly">    movq    %rdi, -24(%rbp) # arr, arr
+# main.c:5:     size_t size = sizeof(arr);
+    movq    $8, -8(%rbp)    #, size
+</code></pre>
+<p>We can see here, compiler directly put 8 to the <code>size</code> variable. The reason is when we pass an array to a function, it will be downgraded to a pointer, so although we write the funcion to be <code>func(int arr[])</code>, when we pass the <code>arr</code> to this function, compiler will treat it as <code>func(int* arr)</code>.</p>
+<p>But it seems weird to me: the compiler should be definitely smart enough to track the passed parameter and can tell it is an array. The only reasonable explanation I found is the &quot;historical&quot; reason:</p>
+<blockquote>
+<p>The only purpose of this rule is to maintain backwards compatibility with historical compilers that did not support passing aggregate values as function arguments.</p>
+</blockquote>
+<p>But anyway, if the C standard says so, ok, at leaset we know when pass array as parameter, it is a pointer. So inside the function, if we want to know how many elements that array contains, we cann't use <code>sizeof(arr)/sizeof(arr[0])</code> any more, because <code>sizeof(arr</code>) will just give us the size of a pointer.</p>
+<p>So in the <code>func</code> function, how do we tell the array's size? An obvious way is we can pass another length paramter to tell this <code>func</code> the array length.</p>
+<pre><code class="language-c">void func(int arr[], int len) {
+   // ...
+}
+</code></pre>
+<p>Or we use the array's address as the paramter :</p>
+<pre><code class="language-c">void func2(int (*arr)[10]) {
+    size_t size = sizeof(*arr);
+    printf(&quot;Inside func2: %ld\n&quot;, size);
+}
+</code></pre>
+<p>If in our <code>main</code> function, we call this <code>func2</code> as <code>func2(&amp;arr);</code>, it will print <code>Inside func2: 40</code>.</p>
+<p>For our <code>func2</code> function, we write a fixed length 10 there. If we want the same trick works for variable length array, we could define the function like this:</p>
+<pre><code class="language-c">void func3(int n, int (*arr)[n]) {
+    size_t size = sizeof(*arr);
+    printf(&quot;Inside func3: %ld\n&quot;, size);
+}
+</code></pre>
+<p>Then call it like <code>func3(10, &amp;arr)</code>, it will also print out the size to be 40.</p>
+<h3 id="variable-length-array-vla">Variable Length Array  (VLA)</h3>
+<p>In the above example, we defined a fixed length array, and when compiler sees <code>sizeof</code>, it immidiately know the size. But what if the array's length is determined at the run time? Say if we have code:</p>
+<pre><code class="language-c">int main() {}
+    int len = 0;
+    scanf(&quot;%d&quot;, &amp;len);
+    int arr2[len];
+    size = sizeof(arr2);
+    printf(&quot;arr2 size: %ld\n&quot;, size);
+    return 0;
+}
+</code></pre>
+<p>Here we take the length from user input, can compiler output the right array size in this case? or it will just treat the array as a pointer now?</p>
+<p>If we try it: we type 10 as the length, it prints arr2 size: 40; we type 20 as the length, it prints arr2 size: 80. So although the size determined during run time, the compiler still has a way to tell use the correct size.</p>
+<p>If we check the generated assembly code, this time the compiler generated much more than the fixed length:</p>
+<pre><code class="language-assembly"># main.c:17:     int arr2[len];
+    movl    -124(%rbp), %ecx    # len, len.0_19
+# main.c:17:     int arr2[len];
+    movslq  %ecx, %rax  # len.0_19, _1
+    subq    $1, %rax    #, _2
+    movq    %rax, -112(%rbp)    # _2, D.2335
+    movslq  %ecx, %rax  # len.0_19, _4
+    movq    %rax, %r14  # _4, _5
+    movl    $0, %r15d   #, _5
+    movslq  %ecx, %rax  # len.0_19, _9
+    movq    %rax, %r12  # _9, _10
+    movl    $0, %r13d   #, _10
+    movslq  %ecx, %rax  # len.0_19, _12
+    leaq    0(,%rax,4), %rdx    #, _24
+    movl    $16, %eax   #, tmp122
+    subq    $1, %rax    #, tmp103
+    addq    %rdx, %rax  # _24, tmp104
+    movl    $16, %edi   #, tmp123
+    movl    $0, %edx    #, tmp107
+    divq    %rdi    # tmp123
+    imulq   $16, %rax, %rax #, tmp106, tmp108
+    movq    %rax, %rdx  # tmp108, tmp110
+    andq    $-4096, %rdx    #, tmp110
+    movq    %rsp, %rsi  #, tmp111
+    subq    %rdx, %rsi  # tmp110, tmp111
+    movq    %rsi, %rdx  # tmp111, tmp111
+.L3:
+    cmpq    %rdx, %rsp  # tmp111,
+    je  .L4 #,
+    subq    $4096, %rsp #,
+    orq $0, 4088(%rsp)  #,
+    jmp .L3 #
+.L4:
+    movq    %rax, %rdx  # tmp108, tmp112
+    andl    $4095, %edx #, tmp112
+    subq    %rdx, %rsp  # tmp112,
+    movq    %rax, %rdx  # tmp108, tmp113
+    andl    $4095, %edx #, tmp113
+    testq   %rdx, %rdx  # tmp113
+    je  .L5 #,
+    andl    $4095, %eax #, tmp114
+    subq    $8, %rax    #, tmp114
+    addq    %rsp, %rax  #, tmp115
+    orq $0, (%rax)  #,
+.L5:
+    movq    %rsp, %rax  #, tmp109
+    addq    $3, %rax    #, tmp116
+    shrq    $2, %rax    #, tmp117
+    salq    $2, %rax    #, tmp118
+    movq    %rax, -104(%rbp)    # tmp118, arr2.1
+# main.c:18:     size = sizeof(arr2);
+    movslq  %ecx, %rax  # len.0_19, _14
+# main.c:18:     size = sizeof(arr2);
+    salq    $2, %rax    #, tmp119
+    movq    %rax, -120(%rbp)    # tmp119, size
+</code></pre>
+<p>We won't dive into details for this code (to see the explanation, you can <a href="https://stackoverflow.com/questions/10078283/how-sizeofarray-works-at-runtime">check it here</a>), but we can see for VLA, <code>sizeof</code> can still correctly evaluate the array size in run time..</p>
+<h3 id="malloc-and-free">malloc and free</h3>
+<p>Another question is, we know if we allocate some memory using <code>malloc</code>, and when we free the memory with the <code>free</code> function, we never pass a second parameter to tell the size (how many memory needs to be free'ed), how does the compiler know that?</p>
+<p>The magic is behind the <code>malloc</code> function, for example, when we call the <code>p = malloc(10)</code> function, although it returns us the address for 10 bytes, under the hood, it will allocate more to keep some meta data like the size. For example, a simplest method could be, it allocate 4 bytes + 10 bytes where the first 4 bytes is used to save the size 10, then it returns the memory address starts from the 10 bytes. Later when we call the <code>free(p)</code> function, <code>free</code> can first use p - 4 bytes to read what the size is, then do a proper delete.</p>
+<h3 id="takeaways">Takeaways</h3>
+<ol>
+<li>array and pointer are different</li>
+<li>when pass an array as parameter to function, it decays to pointer</li>
+<li>we can pass a array pointer as parameter to keep it behaves as an array instead of a pointer</li>
+<li>even array's length is determined during the run time, sizeof can still print out correct size</li>
+<li>malloc function will allocate more to save the size info such that later the free function can get the correct size to free</li>
+</ol>
+<h3 id="reference">Reference:</h3>
+<ol>
+<li><a href="https://www.quora.com/Why-doesn%E2%80%99t-sizeof-a-sizeof-a-0-work-for-an-array-passed-as-a-parameter">https://www.quora.com/Why-doesn%E2%80%99t-sizeof-a-sizeof-a-0-work-for-an-array-passed-as-a-parameter</a></li>
+<li><a href="https://stackoverflow.com/questions/851958/where-do-malloc-and-free-store-allocated-sizes-and-addresses">https://stackoverflow.com/questions/851958/where-do-malloc-and-free-store-allocated-sizes-and-addresses</a></li>
+<li><a href="https://stackoverflow.com/questions/10078283/how-sizeofarray-works-at-runtime">https://stackoverflow.com/questions/10078283/how-sizeofarray-works-at-runtime</a></li>
+</ol>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://bofeng.github.io/post/initialize-c-structure/">
+                <h3 class="post-title">
+                  Initialize C Structure
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://bofeng.github.io/images/avatar.png?v=1587158968879" class="no-responsive avatar">
+    <div class="text-muted"></div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/gnome-display-settings-enable-multiple-scales/">Gnome display settings enable multiple scales</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/array-and-pointer-in-c/">Array and Pointer in C</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/initialize-c-structure/">Initialize C Structure</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/back-pressure/">Back Pressure</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/threadinglocal-and-contextvarscontextvar/">threading.local and contextvars.ContextVar</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/starlette-quick-manual/">🌟 Starlette Quick Manual</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/deploy-poll-app-to-rocketchat/">🚀 Deploy Poll App to Rocket.chat</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/proxy-websocket-timeout/">🚁 Proxy Websocket Timeout </a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/proxy-websocket-configuration-in-apache-and-nginx/">Proxy Websocket Configuration in Apache and Nginx</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/passwd-and-shadow/">passwd &amp; shadow</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge secondary">
+          linux
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge secondary">
+          ubuntu
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Xp4pUvOV9/" class="badge secondary">
+          c
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/MIOrvhB7a/" class="badge secondary">
+          rocketchat
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/B-lE5rjJQ/" class="badge warning">
+          websocket
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4mqNg88O5/" class="badge warning">
+          nginx
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ldB2Nthcy/" class="badge secondary">
+          apache
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/jmsnxeb0L/" class="badge secondary">
+          webpy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dTSYjKA1x/" class="badge secondary">
+          passwd
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4NRPVT4nt/" class="badge ">
+          godaddy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Dr03KtaXl/" class="badge success">
+          raspi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/DfdCdjQwH/" class="badge success">
+          vnc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GLhh3mgC0/" class="badge secondary">
+          logroute
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Y-U7pc_rs/" class="badge warning">
+          uwsgi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/2ldRfwlTHj/" class="badge ">
+          ngrok
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/N7uzveFEQ/" class="badge secondary">
+          flask
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/t46GgOmQJ/" class="badge success">
+          classmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/7tN2CvtD1N/" class="badge ">
+          staticmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eSZ5lHy7P/" class="badge warning">
+          python
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/8bPDgHSAN/" class="badge success">
+          web
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vJnENzWsf/" class="badge ">
+          ssl
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dnoL5D0w-/" class="badge secondary">
+          mail
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/yuo6OYefk4/" class="badge secondary">
+          smtp
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GS8sncYwZ/" class="badge success">
+          rsync
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/EXump4cPm/" class="badge success">
+          pypi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/LzDugb5gQm/" class="badge secondary">
+          cors
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rLcaXQkmK/" class="badge secondary">
+          vim
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vLxhso05B/" class="badge success">
+          strace
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/IbPl9to7C/" class="badge warning">
+          google
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/X_VKuDyUs/" class="badge ">
+          opensource
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/JPaKbEpxsK/" class="badge success">
+          license
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/0uGMCxZDs/" class="badge secondary">
+          mkdocs
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/K5ngz4Z3X/" class="badge secondary">
+          cloudflare
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/XlycwU8qXZ/" class="badge ">
+          github
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/OLHLFT4if/" class="badge warning">
+          ssh
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/AWO0Br2y4/" class="badge success">
+          scratch
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0PlhyDUc/" class="badge ">
+          algorithm
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0zRGJ6aD/" class="badge warning">
+          jQuery
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/3NETfISBbQ/" class="badge ">
+          js
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4zLHN4PXY/" class="badge warning">
+          docker
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ROXx9algt/" class="badge secondary">
+          opencourse
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/1KJQkim0xD/" class="badge secondary">
+          course
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/-Mmbm4s8hZ/" class="badge secondary">
+          education
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/QibBEdubUA/" class="badge ">
+          chromebook
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rMdHe7zYUx/" class="badge warning">
+          iOS
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/w0rUetnyT/" class="badge success">
+          life
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ypaP9jx_V/" class="badge success">
+          hls
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ITnA4khP_/" class="badge success">
+          protobuf
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/5XAvbVu7Y/" class="badge secondary">
+          loadbalance
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/G6EOG9dUqx/" class="badge warning">
+          server
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/v-BqS_DjJ/" class="badge ">
+          iPhone
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/I7SG4keW3/" class="badge secondary">
+          objc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/g_FfQMIOg/" class="badge secondary">
+          memcached
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eAw-5Salr/" class="badge secondary">
+          datamining
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

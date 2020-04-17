@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>IP负载均衡 | 0xBF</title>
+<meta name="description" content="">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://bofeng.github.io/favicon.ico?v=1587158968879">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://bofeng.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://bofeng.github.io">0xBF</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/open-source-license-flow-chart/" class="menu">
+                Open Source License
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>IP负载均衡</h1>
+            <p class="article-meta">
+              2011-05-05
+              
+                <a href="https://bofeng.github.io/tag/5XAvbVu7Y/" class="badge warning">
+                  loadbalance
+                </a>
+              
+                <a href="https://bofeng.github.io/tag/G6EOG9dUqx/" class="badge secondary">
+                  server
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p>最近项目服务端有个服务要配置LVS，因为时间久了，隐约记得原理是改了数据包的目标地址，于是重读了之前看过的《构建高性能的web站点》的第12章的12.5小节，IP负载均衡，记录如下：</p>
+<!-- more -->
+<p>在数据链路层（第二层），网络层（第三层）以及传输层（四层）都可以实现不同机制的负载均衡，这些负载均衡必须由linux内核完成，我们希望网络数据包在内核缓冲区进入进程用户地址空间之前，尽早的被转发到其他实际服务器上。</p>
+<p>基于NAT技术的负载均衡，工作在传输层，对数据包的IP地址和端口信息进行修改，所以也称四层负载均衡：DNAT：修改的是数据包的目标地址和端口；NAT服务器拥有两块网卡，分别连接外部网络和内部网络。</p>
+<h3 id="使用iptables实现转发">使用iptables实现转发：</h3>
+<pre><code>echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+iptables -t nat -A PREROUTING -i eth0 -p tcp –dport 8001 -j DNAT –to-destination 10.0.1.210:8000
+</code></pre>
+<p>这条将调度器外网网卡上的8001端口接收的所有请求转发给10.0.1.210这台服务器的8000端口</p>
+<p>转发规则已经存在，但是我们必须将实际服务器的默认网关设置为NAT服务器，也就是说，NAT服务器必须为实际服务器的网关，否则，数据包被转发后会一去不复返。</p>
+<p>添加默认网关：<code>route add default gw 10.0.1.50</code>，查看路由表，刚才的默认网关已出现：<code>$ route</code></p>
+<h3 id="lvs-nat-net-address-transform">LVS-NAT (net address transform)：</h3>
+<p>ipvs = IP Virtual Server = LVS</p>
+<p>要想知道内核中是否已经安装IPVS模块，可以查看：<code>modprob -l | grep ipvs</code></p>
+<p>ipvs也需要管理工具：ipvsadm</p>
+<p>设置步骤：</p>
+<ol>
+<li>打开调度器的数据包转发选项：<code>echo 1 &gt; /proc/sys/net/ipv4/ip_forward</code></li>
+<li>检查实际服务器是否已经将NAT服务器作为自己的默认网关 <code>route add default gw 10.0.1.50</code></li>
+<li>配置IPVS：</li>
+</ol>
+<pre><code>ipvsadm -A -t 125.12.12.12:80 -s rr
+ipvsadm -a -t 125.12.12.12:80 -r 10.0.1.210:8000 -m
+ipvsadm -a -t 125.12.12.12:80 -r 10.0.1.211:8000 -m
+</code></pre>
+<p>第一行规则添加一台虚拟服务器，也就是负载均衡调度器，这里的-s rr是指采用简单轮询的RR调度策略。后面两行用来为调度器添加实际服务器，其中-m表示采用NAT方式来转发数据包。</p>
+<p>除了RR，LVS还提供了一系列的动态调度策略，比如最小连接（LC），带权重的最小连接（WLC），最短期望时间延迟（SED）等。</p>
+<h3 id="lvs-dr-direct-route">LVS-DR (direct route)：</h3>
+<p>直接路由方式下的负载均衡调度工作在数据链路层（第二层），简单地说，它通过修改数据包的目标 MAC地址，将数据包转发到实际服务器上，并且，最重要的是，实际服务器的响应数据包将直接发送给客户端，而不经过调度器。（实际服务器要配置ip别名）</p>
+<p>一个网络接口最多可以设置256个ip别名，可以把一个C类网段的所有IP地址都设置到一个网卡上。<code>ipconfig eth0:0 125.12.12.77</code> 使用以上命令就设置了一个ip别名。</p>
+<h4 id="工作过程">工作过程</h4>
+<p>调度器通过修改数据包的目标MAC地址，将它转发给实际服务器，注意它并没有修改目标IP地址，那么一旦数据包到了实际服务器后，发现实际服务器的IP地址并不是数据包的目标IP地址。所以我们要做的就是给实际服务器添加和调度器IP地址相同的IP别名。</p>
+<h4 id="步骤">步骤</h4>
+<p>1，给调度器和实际服务器配置相同的IP别名。我们将IP别名添加到回环接口lo上，并且设置路由规则，让实际服务器不要去寻找其他拥有这个IP别名的服务器</p>
+<pre><code>ifconfig lo:0 125.12.12.77 broadcast 125.12.12.77 netmask 255.255.255.255 up
+route add -host 125.12.12.77 dev lo:0
+</code></pre>
+<p>2，防止实际服务器响应来自网络针对ip别名的ARP广播，执行操作：</p>
+<pre><code>echo “1” &gt; /proc/sys/net/ipv4/conf/lo/arp_ignore
+echo “2” &gt; /proc/sys/net/ipv4/conf/lo/arp_announce
+echo “1” &gt; /proc/sys/net/ipv4/conf/all/arp_ignore
+echo “2” &gt; /proc/sys/net/ipv4/conf/all/arp_announce
+</code></pre>
+<p>3，使用ipvsadm配置LVS-DR集群</p>
+<pre><code>ipvsadm -A -t 125.12.12.77:80 -s rr
+ipvsadm -a -t 125.12.12.77:80 -r 125.12.12.20:80 -g
+ipvsadm -a -t 125.12.12.77:80 -r 125.12.12.21:80 -g
+</code></pre>
+<p>这里使用了-g选项，告诉调度器使用直接路由的方式转发数据包。</p>
+<p>需要注意的是，在使用DR进行转发的情况下，无法修改数据包的目的端口，原因是这种转发机制工作在数据链路层，所以对于上层的信息端口无能为力。</p>
+<p>相比于LVS-NAT，LVS-DR的优势在于，实际服务器的响应数据包可以不经过调度器而直接发往客户端。</p>
+<h3 id="lvs-tun-tunnel">LVS-TUN (tunnel)：</h3>
+<p>IP 隧道：<br>
+基于IP隧道的负载均衡系统同样可以用LVS来实现，也成为LVS-TUN，与LVS-DR不同的是，实际服务器可以和调度器不在同一个WAN网段，调度器通过IP隧道技术来实现转发请求到实际服务器，所以实际服务器也必须拥有合法的IP地址。</p>
+<p>基于IP隧道的转发机制，简单来说，它是将调度器收到的IP数据包封装在一个新的IP数据包中，转交给实际服务器，然后实际服务器的响应数据包可以直接到达用户端。</p>
+<h3 id="调度器单点">调度器单点：</h3>
+<p>对于调度器，转移请求的机制注定它存在单点故障，我们必须实现故障平滑转移。心跳包可以很好的解决这个问题，我们可以准备一台备用调度器，通过运行heartbeat对主调度器进行心跳检测，一旦发现主调度器停止心跳，便立即启动故障转移，接管主调度器，这个接管过程包括IP别名变更，相关服务的启动等。</p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://bofeng.github.io/post/zi-ding-yi-iphone-de-ling-sheng/">
+                <h3 class="post-title">
+                  自定义iPhone的铃声
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://bofeng.github.io/images/avatar.png?v=1587158968879" class="no-responsive avatar">
+    <div class="text-muted"></div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/gnome-display-settings-enable-multiple-scales/">Gnome display settings enable multiple scales</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/array-and-pointer-in-c/">Array and Pointer in C</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/initialize-c-structure/">Initialize C Structure</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/back-pressure/">Back Pressure</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/threadinglocal-and-contextvarscontextvar/">threading.local and contextvars.ContextVar</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/starlette-quick-manual/">🌟 Starlette Quick Manual</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/deploy-poll-app-to-rocketchat/">🚀 Deploy Poll App to Rocket.chat</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/proxy-websocket-timeout/">🚁 Proxy Websocket Timeout </a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/proxy-websocket-configuration-in-apache-and-nginx/">Proxy Websocket Configuration in Apache and Nginx</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/passwd-and-shadow/">passwd &amp; shadow</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge ">
+          linux
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge secondary">
+          ubuntu
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Xp4pUvOV9/" class="badge secondary">
+          c
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/MIOrvhB7a/" class="badge warning">
+          rocketchat
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/B-lE5rjJQ/" class="badge warning">
+          websocket
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4mqNg88O5/" class="badge secondary">
+          nginx
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ldB2Nthcy/" class="badge ">
+          apache
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/jmsnxeb0L/" class="badge ">
+          webpy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dTSYjKA1x/" class="badge ">
+          passwd
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4NRPVT4nt/" class="badge ">
+          godaddy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Dr03KtaXl/" class="badge warning">
+          raspi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/DfdCdjQwH/" class="badge secondary">
+          vnc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GLhh3mgC0/" class="badge secondary">
+          logroute
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Y-U7pc_rs/" class="badge secondary">
+          uwsgi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/2ldRfwlTHj/" class="badge ">
+          ngrok
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/N7uzveFEQ/" class="badge secondary">
+          flask
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/t46GgOmQJ/" class="badge warning">
+          classmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/7tN2CvtD1N/" class="badge secondary">
+          staticmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eSZ5lHy7P/" class="badge warning">
+          python
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/8bPDgHSAN/" class="badge success">
+          web
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vJnENzWsf/" class="badge success">
+          ssl
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dnoL5D0w-/" class="badge warning">
+          mail
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/yuo6OYefk4/" class="badge secondary">
+          smtp
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GS8sncYwZ/" class="badge secondary">
+          rsync
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/EXump4cPm/" class="badge success">
+          pypi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/LzDugb5gQm/" class="badge secondary">
+          cors
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rLcaXQkmK/" class="badge ">
+          vim
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vLxhso05B/" class="badge warning">
+          strace
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/IbPl9to7C/" class="badge secondary">
+          google
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/X_VKuDyUs/" class="badge secondary">
+          opensource
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/JPaKbEpxsK/" class="badge success">
+          license
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/0uGMCxZDs/" class="badge warning">
+          mkdocs
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/K5ngz4Z3X/" class="badge secondary">
+          cloudflare
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/XlycwU8qXZ/" class="badge success">
+          github
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/OLHLFT4if/" class="badge secondary">
+          ssh
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/AWO0Br2y4/" class="badge ">
+          scratch
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0PlhyDUc/" class="badge success">
+          algorithm
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0zRGJ6aD/" class="badge success">
+          jQuery
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/3NETfISBbQ/" class="badge secondary">
+          js
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4zLHN4PXY/" class="badge secondary">
+          docker
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ROXx9algt/" class="badge ">
+          opencourse
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/1KJQkim0xD/" class="badge warning">
+          course
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/-Mmbm4s8hZ/" class="badge warning">
+          education
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/QibBEdubUA/" class="badge warning">
+          chromebook
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rMdHe7zYUx/" class="badge warning">
+          iOS
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/w0rUetnyT/" class="badge secondary">
+          life
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ypaP9jx_V/" class="badge ">
+          hls
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ITnA4khP_/" class="badge warning">
+          protobuf
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/5XAvbVu7Y/" class="badge warning">
+          loadbalance
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/G6EOG9dUqx/" class="badge secondary">
+          server
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/v-BqS_DjJ/" class="badge secondary">
+          iPhone
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/I7SG4keW3/" class="badge success">
+          objc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/g_FfQMIOg/" class="badge secondary">
+          memcached
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eAw-5Salr/" class="badge secondary">
+          datamining
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

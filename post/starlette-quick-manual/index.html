@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>🌟 Starlette Quick Manual | 0xBF</title>
+<meta name="description" content="">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://bofeng.github.io/favicon.ico?v=1587158968879">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://bofeng.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://bofeng.github.io">0xBF</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/open-source-license-flow-chart/" class="menu">
+                Open Source License
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>🌟 Starlette Quick Manual</h1>
+            <p class="article-meta">
+              2020-02-09
+              
+            </p>
+            
+            <div class="post-content">
+              <p><a href="https://www.starlette.io/">Starlette</a> is an ASGI web framework for Python.</p>
+<h2 id="1-get-value-from-query-string">1, Get value from Query String</h2>
+<p>This is commonly used when trying to get param value from GET request.</p>
+<pre><code class="language-python">async def handler(request):
+    name = request.query_params.get(&quot;name&quot;)
+</code></pre>
+<h2 id="2-get-value-from-path">2, Get value from Path</h2>
+<pre><code class="language-python"># In url if you config:
+Route(&quot;/post/{postid}&quot;, endpoint=post)
+
+# In handler function:
+async def post(request):
+    postid = request.path_params.get(&quot;postid&quot;)
+</code></pre>
+<h2 id="3-get-value-from-body">3, Get value from Body</h2>
+<p>This is commonly used when trying to get param value from a POST request.</p>
+<pre><code class="language-python">async def handler(request):
+    inp = await request.form()
+    name = inp.get(&quot;name&quot;)
+</code></pre>
+<h2 id="4-get-uploaded-file-content">4, Get uploaded file content</h2>
+<pre><code class="language-python">async def handler(request):
+    inp = await request.form()
+    uploaded_file = inp[&quot;filename&quot;]
+    filename = uploaded_file.filename           # abc.png
+    content_type = uploaded.content_type    # MIME type, e.g. image/png
+    content = await uploaded_file.read()       # image content
+</code></pre>
+<h2 id="5-return-a-rendered-page-response">5, Return a rendered page response</h2>
+<pre><code class="language-python">from starlette.templating import Jinja2Templates
+TMPL_ENGINE = Jinja2Templates(directory=&quot;templates&quot;)
+
+async def handler(request):
+    data = {
+        &quot;request&quot;: request,
+        # ... other data
+    }
+    return TMPL_ENGINE.TemplateResponse(&quot;home.html&quot;, data)
+</code></pre>
+<h2 id="6-return-a-json-response">6, Return a JSON response</h2>
+<pre><code class="language-python">from starlette.responses import JSONResponse
+
+async def handler(request):
+    return JSONResponse({&quot;name&quot;: &quot;Bo&quot;})
+</code></pre>
+<h2 id="7-return-a-customized-response-status-code-and-headers">7, Return a customized response (status code and headers)</h2>
+<p>The above <code>TemplateResponse</code> and <code>JSONResponse</code> are subclass of the <code>Response</code> class. We can return a customized <code>Response</code>:</p>
+<pre><code class="language-python">import json
+from starlette.responses import Response
+
+async def handler(request):
+    data = {
+        &quot;name&quot;: &quot;Bo&quot;
+    }
+    return Response(json.dumps(data), media_type=&quot;application/json&quot;)
+</code></pre>
+<p><code>Response</code> takes <code>status_code</code>, <code>headers</code> and <code>media_type</code>, so if we want to change a response's status code, we can do:</p>
+<pre><code class="language-python">return Response(content, statu_code=404)
+</code></pre>
+<p>And customized headers:</p>
+<pre><code class="language-python">headers = {
+	&quot;x-extra-key&quot;: &quot;value&quot;
+}
+return Response(content, status_code=200, headers=headers)
+</code></pre>
+<p>Since <code>TemplateResponse</code> and <code>JSONResponse</code> are subclass of <code>Response</code>, these 3 parameters can be applied to them.</p>
+<pre><code class="language-python">return TMPL_ENGINE.TemplateResponse(&quot;home.html&quot;, data, headers=headers)
+# And
+return JSONResponse({&quot;name&quot;: &quot;Bo&quot;}, status_code=200, headers=headers)
+</code></pre>
+<h2 id="8-redirect">8, Redirect</h2>
+<pre><code class="language-python">from starlette.responses import RedirectResponse
+
+async handler(request):
+    # Customize status_code: 
+    #   301: permanent redirect 
+    #   302: temporary redirect 
+    #   303: see others
+    #   307: temporary redirect (default)
+    return RedirectResponse(url=url, status_code=303)
+</code></pre>
+<h2 id="9-get-set-cookies">9, Get &amp; Set Cookies</h2>
+<pre><code class="language-python"># get cookie
+async def handler(request):
+    request.cookies.get('mycookie')
+
+# set cookie
+async def handler(request):
+    resp = Response(content)
+    # set_cookie(key, value, max_age=None, expires=None, path=&quot;/&quot;, domain=None, secure=False, httponly=False)
+    resp.set_cookie(&quot;mycookie&quot;, &quot;value&quot;)
+    # delete cookie: delete_cookie(key, path='/', domain=None)
+    resp.delete_cookie(&quot;myoldcookie&quot;)
+    return resp
+</code></pre>
+<h2 id="10-use-session">10, Use session</h2>
+<p>Starlette provides a cookie-based session middleware:</p>
+<pre><code class="language-python">from starlette.middleware import Middleware
+from starlette.middleware.sessions import SessionMiddleware
+
+middlewares = [
+    Middleware(SessionMiddleware,
+                secret_key=config.SESSION_CONFIG[&quot;secret_key&quot;],
+                max_age=config.SESSION_CONFIG[&quot;max_age&quot;]),
+]
+
+app = Starlette(routes=routes, middleware=middlewares)
+
+# Then in handler you can use it
+async def handler(request):
+    request.session[&quot;login_user&quot;] = &quot;bo&quot;
+</code></pre>
+<p>Since this middleware used <code>json</code> to serialize and deserialize data, the data you saved in session need to be <code>json</code> serializiable. For example, if you save a <code>ObjectId</code> object (from MongoDB) in session, it won't know how to use json to serialize it, thus will raise exception and cannot save to cookie.</p>
+<h2 id="11-request-context">11, Request context</h2>
+<h3 id="1-url-object-requesturl">1) URL Object: <code>request.url</code></h3>
+<ul>
+<li>Get request full url: <code>url = str(request.url)</code></li>
+<li>Get scheme: <code>request.url.scheme</code> (http, https, ws, wss)</li>
+<li>Get netloc: <code>request.url.netloc</code>, e.g.: example.com:8080</li>
+<li>Get path: <code>request.url.path</code>, e.g.: /search</li>
+<li>Get query string: <code>request.url.query</code>, e.g.: kw=hello</li>
+<li>Get hostname: <code>request.url.hostname</code>, e.g.: example.com</li>
+<li>Get port: <code>request.url.port</code>, e.g.: 8080</li>
+<li>If using secure scheme: <code>request.url.is_secure</code>, True is schme is <code>https</code> or <code>wss</code></li>
+</ul>
+<h3 id="2-headers-requestheaders">2) Headers: <code>request.headers</code></h3>
+<pre><code class="language-python">{
+    'host': 'example.com:8080', 
+    'connection': 'keep-alive', 
+    'cache-control': 'max-age=0', 
+    'sec-ch-ua': 'Google Chrome 80', 
+    'dnt': '1', 
+    'upgrade-insecure-requests': '1', 
+    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) ...',
+    'sec-fetch-dest': 'document', 
+    'accept': 'text/html,image/apng,*/*;q=0.8;v=b3;q=0.9', 
+    'sec-origin-policy': '0', 
+    'sec-fetch-site': 'none', 
+    'sec-fetch-mode': 'navigate', 
+    'sec-fetch-user': '?1', 
+    'accept-encoding': 'gzip, deflate, br', 
+    'accept-language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7,zh-TW;q=0.6', 
+    'cookie': 'session=eyJhZG1pbl91c2_KiQ...'
+}
+</code></pre>
+<h3 id="3-client-requestclient">3) Client: <code>request.client</code></h3>
+<ul>
+<li><code>request.client.host</code>: get client sock IP</li>
+<li><code>request.client.port</code>: get client sock port</li>
+</ul>
+<h3 id="4-method-requestmethod">4) Method: <code>request.method</code></h3>
+<ul>
+<li><code>request.method</code>: GET, POST, etc.</li>
+</ul>
+<h3 id="5-get-data">5) Get Data</h3>
+<ul>
+<li><code>await request.body()</code>: get raw data from body</li>
+<li><code>await request.json()</code>: get passed data and parse it as JSON</li>
+<li><code>await request.form()</code>: get posted data and pass it as dictionary</li>
+</ul>
+<h3 id="6-scope-requestscope">6) Scope: <code>request.scope</code></h3>
+<pre><code class="language-python">{
+    'type': 'http', 
+    'http_version': '1.1', 
+    'server': ('127.0.0.1', 9092), 
+    'client': ('127.0.0.1', 53102), 
+    'scheme': 'https', 
+    'method': 'GET', 
+    'root_path': '', 
+    'path': '/', 
+    'raw_path': b'/', 
+    'query_string': b'kw=hello', 
+    'headers': [
+        (b'host', b'example.com:8080'), 
+        (b'connection', b'keep-alive'), 
+        (b'cache-control', b'max-age=0'), 
+        ...
+    ], 
+    'app': &lt;starlette.applications.Starlette object at 0x1081bd650&gt;, 
+    'session': {'uid': '57ba03ea7333f72a25f837cf'}, 
+    'router': &lt;starlette.routing.Router object at 0x1081bd6d0&gt;, 
+    'endpoint': &lt;class 'app.index.Index'&gt;, 
+    'path_params': {}
+}
+</code></pre>
+<h2 id="12-put-varaible-in-request-app-scope">12, Put varaible in request &amp; app scope</h2>
+<pre><code class="language-python">app.state.dbconn = get_db_conn()
+request.state.start_time = time.time()
+# use app-scope state variable in a request
+request.app.state.dbconn
+</code></pre>
+<h2 id="13-utility-functions">13, Utility functions</h2>
+<h3 id="1-use-state-to-wrap-a-dictionary">1) Use <code>State</code> to wrap a dictionary</h3>
+<pre><code class="language-python">from starlette.datastructures import State
+
+data = {
+    &quot;name&quot;: &quot;Bo&quot;
+}
+print(data[&quot;name&quot;])
+# now wrap it with State function
+wrapped = State(data)
+# You can use the dot syntaxt, but can't use `wrapped[&quot;name&quot;]` any more.
+print(wrapped.name)
+</code></pre>
+<h3 id="2-check-if-request-is-a-ajax-request">2) check if request is a ajax request</h3>
+<p>Depend on what client library you are using, the header's key and value might be different. Here is an example when use <code>$.ajax</code> function from jQuery.</p>
+<pre><code class="language-python">return request.headers.get(&quot;x-requested-with&quot;) == &quot;XMLHttpRequest&quot;
+</code></pre>
+<h3 id="3-login_required-wrapper-function">3) login_required wrapper function</h3>
+<pre><code class="language-python">import functools
+from starlette.endpoints import HTTPEndpoint
+from starlette.responses import Response
+
+def login_required(login_url=&quot;/signin&quot;):
+    def decorator(handler):
+        @functools.wraps(handler)
+        async def new_handler(obj, req, *args, **kwargs):
+            user = req.session.get(&quot;login_user&quot;)
+            if user is None:
+                return seeother(login_url)
+            return await handler(obj, req, *args, **kwargs)
+        return new_handler
+    return decorator
+
+class MyAccount(HTTPEndpiont):
+    @login_required()
+    async def get(self, request):
+        # some logic here
+        content = &quot;hello&quot;
+        return Response(content)
+</code></pre>
+<h2 id="14-exceptions">14, Exceptions</h2>
+<p>Handle exception and customize 403, 404, 503, 500 page:</p>
+<pre><code class="language-python">from starlette.exceptions import HTTPException
+
+async def exc_handle_403(request, exc):
+    return HTMLResponse(&quot;My 403 page&quot;, status_code=exc.status_code)
+
+async def exc_handle_404(request, exc):
+    return HTMLResponse(&quot;My 404 page&quot;, status_code=exc.status_code)
+
+async def exc_handle_503(request, exc):
+    return HTMLResponse(&quot;Failed, please try it later&quot;, status_code=exc.status_code)
+
+# error is not exception, 500 is server side unexpected error, all other status code will be treated as Exception
+async def err_handle_500(request, exc):
+    import traceback
+    Log.error(traceback.format_exc())
+    return HTMLResponse(&quot;My 500 page&quot;, status_code=500)
+
+# To add handler, we can add either status_code or Exception itself as key
+exception_handlers = {
+    403: exc_handle_403,
+    404: exc_handle_404,
+    503: exc_handle_503,
+    500: err_handle_500,
+    #HTTPException: exc_handle_500,
+}
+
+app = Starlette(routes=routes, exception_handlers=exception_handlers)
+</code></pre>
+<h2 id="15-background-task">15, Background Task</h2>
+<h3 id="1-put-some-async-task-as-background-task">1) Put some async task as background task</h3>
+<pre><code class="language-python">import aiofiles
+from starlette.background import BackgroundTask
+from starlette.responses import Response
+
+aiofiles_remove = aiofiles.os.wrap(os.remove)
+
+async def del_file(fpath):
+    await aiofiles_remove(fpath)
+
+async def handler(request):
+    content = &quot;&quot;
+    fpath = &quot;/tmp/tmpfile.txt&quot;
+    task = BackgroundTask(del_file, fpath=fpath)
+    return Response(content, background=task)
+</code></pre>
+<h3 id="2-put-multiple-tasks-as-background-task">2) Put multiple tasks as background task</h3>
+<pre><code class="language-python">from starlette.background import BackgroundTasks
+
+async def task1(name):
+    pass
+
+async def task2(email):
+    pass
+
+async def handler(request):
+    tasks = BackgroundTasks()
+    tasks.add_task(task1, name=&quot;John&quot;)
+    tasks.add_task(task2, email=&quot;info@example.com&quot;)
+    content = &quot;&quot;
+    return Response(content, background=tasks)
+</code></pre>
+<h2 id="16-write-middleware">16, Write middleware</h2>
+<p>There are 2 ways to write middleware:</p>
+<h3 id="1-define-__call__-function">1) Define <code>__call__</code> function:</h3>
+<pre><code class="language-python">class MyMiddleware:
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        # see above scope dictionary as reference
+        headers = dict(scope[&quot;headers&quot;])
+        # do something
+        # pass to next middleware
+        return await self.app(scope, receive, send)
+</code></pre>
+<h3 id="2-use-basehttpmiddleware">2) Use <code>BaseHTTPMiddleware</code></h3>
+<pre><code class="language-python">from starlette.middleware.base import BaseHTTPMiddleware
+
+class CustomHeaderMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        # do something before pass to next middleware
+        response = await call_next(request)
+        # do something after next middleware returned
+        response.headers['X-Author'] = 'John'
+        return response
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://bofeng.github.io/post/deploy-poll-app-to-rocketchat/">
+                <h3 class="post-title">
+                  🚀 Deploy Poll App to Rocket.chat
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://bofeng.github.io/images/avatar.png?v=1587158968879" class="no-responsive avatar">
+    <div class="text-muted"></div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/gnome-display-settings-enable-multiple-scales/">Gnome display settings enable multiple scales</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/array-and-pointer-in-c/">Array and Pointer in C</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/initialize-c-structure/">Initialize C Structure</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/back-pressure/">Back Pressure</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/threadinglocal-and-contextvarscontextvar/">threading.local and contextvars.ContextVar</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/starlette-quick-manual/">🌟 Starlette Quick Manual</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/deploy-poll-app-to-rocketchat/">🚀 Deploy Poll App to Rocket.chat</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/proxy-websocket-timeout/">🚁 Proxy Websocket Timeout </a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/proxy-websocket-configuration-in-apache-and-nginx/">Proxy Websocket Configuration in Apache and Nginx</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/passwd-and-shadow/">passwd &amp; shadow</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge secondary">
+          linux
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge secondary">
+          ubuntu
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Xp4pUvOV9/" class="badge warning">
+          c
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/MIOrvhB7a/" class="badge success">
+          rocketchat
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/B-lE5rjJQ/" class="badge secondary">
+          websocket
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4mqNg88O5/" class="badge ">
+          nginx
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ldB2Nthcy/" class="badge warning">
+          apache
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/jmsnxeb0L/" class="badge secondary">
+          webpy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dTSYjKA1x/" class="badge ">
+          passwd
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4NRPVT4nt/" class="badge success">
+          godaddy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Dr03KtaXl/" class="badge secondary">
+          raspi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/DfdCdjQwH/" class="badge warning">
+          vnc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GLhh3mgC0/" class="badge warning">
+          logroute
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Y-U7pc_rs/" class="badge warning">
+          uwsgi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/2ldRfwlTHj/" class="badge warning">
+          ngrok
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/N7uzveFEQ/" class="badge secondary">
+          flask
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/t46GgOmQJ/" class="badge warning">
+          classmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/7tN2CvtD1N/" class="badge ">
+          staticmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eSZ5lHy7P/" class="badge ">
+          python
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/8bPDgHSAN/" class="badge ">
+          web
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vJnENzWsf/" class="badge warning">
+          ssl
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dnoL5D0w-/" class="badge secondary">
+          mail
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/yuo6OYefk4/" class="badge secondary">
+          smtp
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GS8sncYwZ/" class="badge warning">
+          rsync
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/EXump4cPm/" class="badge warning">
+          pypi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/LzDugb5gQm/" class="badge secondary">
+          cors
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rLcaXQkmK/" class="badge secondary">
+          vim
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vLxhso05B/" class="badge secondary">
+          strace
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/IbPl9to7C/" class="badge ">
+          google
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/X_VKuDyUs/" class="badge warning">
+          opensource
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/JPaKbEpxsK/" class="badge secondary">
+          license
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/0uGMCxZDs/" class="badge warning">
+          mkdocs
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/K5ngz4Z3X/" class="badge secondary">
+          cloudflare
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/XlycwU8qXZ/" class="badge ">
+          github
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/OLHLFT4if/" class="badge warning">
+          ssh
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/AWO0Br2y4/" class="badge secondary">
+          scratch
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0PlhyDUc/" class="badge success">
+          algorithm
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0zRGJ6aD/" class="badge secondary">
+          jQuery
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/3NETfISBbQ/" class="badge ">
+          js
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4zLHN4PXY/" class="badge warning">
+          docker
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ROXx9algt/" class="badge warning">
+          opencourse
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/1KJQkim0xD/" class="badge warning">
+          course
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/-Mmbm4s8hZ/" class="badge ">
+          education
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/QibBEdubUA/" class="badge warning">
+          chromebook
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rMdHe7zYUx/" class="badge secondary">
+          iOS
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/w0rUetnyT/" class="badge success">
+          life
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ypaP9jx_V/" class="badge success">
+          hls
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ITnA4khP_/" class="badge secondary">
+          protobuf
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/5XAvbVu7Y/" class="badge secondary">
+          loadbalance
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/G6EOG9dUqx/" class="badge ">
+          server
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/v-BqS_DjJ/" class="badge warning">
+          iPhone
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/I7SG4keW3/" class="badge ">
+          objc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/g_FfQMIOg/" class="badge secondary">
+          memcached
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eAw-5Salr/" class="badge success">
+          datamining
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

@@ -2,13 +2,111 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://bofeng.github.io</id>
     <title>0xBF</title>
-    <updated>2020-04-17T21:29:33.443Z</updated>
+    <updated>2020-04-18T21:39:40.101Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://bofeng.github.io"/>
     <link rel="self" href="https://bofeng.github.io/atom.xml"/>
     <logo>https://bofeng.github.io/images/avatar.png</logo>
     <icon>https://bofeng.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, 0xBF</rights>
+    <entry>
+        <title type="html"><![CDATA[Why there is no "gets" function in C standard library?]]></title>
+        <id>https://bofeng.github.io/post/why-there-is-no-gets-function-in-c-standard-library/</id>
+        <link href="https://bofeng.github.io/post/why-there-is-no-gets-function-in-c-standard-library/">
+        </link>
+        <updated>2020-04-17T20:39:49.000Z</updated>
+        <content type="html"><![CDATA[<p>If you are new to learn C program, you may find there are many functions like &quot;getc&quot;, &quot;putc&quot;, &quot;getchar&quot;, &quot;putchar&quot;, &quot;fgets&quot;, &quot;fputs&quot; : every &quot;put&quot; function comes with a corresponding &quot;get&quot; function. But there is a &quot;puts&quot; function while no &quot;gets&quot; function. Why?</p>
+<p>Well, the short anwer is, the &quot;gets&quot; function was there before in C89 standard, then it got deprecated in C99 and removed in C11. But let's see why it got removed.</p>
+<p>First let's check the function's declaration:</p>
+<pre><code class="language-c">char* gets(char* str)
+</code></pre>
+<p>Basically we pass a pre-allocated &quot;str&quot; buffer to this function, <code>gets</code> will get user's input and save it into this buffer. So we can write some code like this:</p>
+<pre><code class="language-c">char buffer[20] = {0};
+gets(buffer);
+printf(&quot;Your input is: %s\n&quot;, buffer);
+</code></pre>
+<p>If we use <code>gcc</code> to compile the code, we can see the error something like this:</p>
+<blockquote>
+<p>main.c:(.text+0x164): warning: the `gets' function is dangerous and should not be used.</p>
+</blockquote>
+<p>We can see using this function is <strong>dangerous</strong>, but if we ignore this warning and go ahead run our program: if we type &quot;hello world&quot; as our input, the program can correctly put this string out.</p>
+<p>So why is it dangerous? In our program we allocated a char array which has 20 slots, and our input &quot;hello world&quot; which are 11 characters, will be saved inside this array from position 0. Our &quot;hello world&quot; case works well, but now imagine what if our input has more than 20 characters, then we won't have enough space to save all of these characters:</p>
+<pre><code class="language-bash">$ ./main
+hello world hello world hello world
+Your input is: hello world hello world hello world
+*** stack smashing detected ***: &lt;unknown&gt; terminated
+Aborted (core dumped)
+</code></pre>
+<p>In this case, since we don't have enough space to save user's input, the program crashed.</p>
+<p>Sometimes this may cause bug that harder to find, suppose we have code like this:</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main() {
+    char c = 'c';
+    char arr[10] = {0};
+    printf(&quot;before gets: variable c is %c\n&quot;, c);
+    gets(arr);
+    printf(&quot;after gets: variable c is %c\n&quot;, c);
+    return 0;
+}
+</code></pre>
+<p>Before we compile and run the code, guess what the output would be if in the <code>gets</code> step, we type &quot;hello world&quot;.</p>
+<p>Your guess might be the program will crash since &quot;hello world&quot; in total are 11 characters (including the white-space in the middel) but our allocated <code>arr</code> only have 10 slots. Well, you are not wrong with the <strong>modern compiler</strong>, by that I mean, if we compile the code and run it:</p>
+<pre><code class="language-bash">$ gcc main.c -o main
+main.c:(.text+0x51): warning: the 'gets' function is dangerous and should not be used.
+$ ./main
+before gets: variable c is c
+hello world
+after gets: variable c is c
+*** stack smashing detected ***: &lt;unknown&gt; terminated
+Aborted (core dumped)
+</code></pre>
+<p>But in the old compiler, you might won't have this crashed. The modern <code>gcc</code> will compile with a default &quot;stack-protector&quot; turned on. Let's try to turn it off then run again:</p>
+<pre><code class="language-bash">$ gcc main.c -fno-stack-protector -o main
+main.c:(.text+0x42): warning: the 'gets' function is dangerous and should not be used.
+$ ./main
+before gets: variable c is c
+hello world
+after gets: variable c is d
+</code></pre>
+<p>Ah, this time the program doesn't crash. But our varaible 'c' which is declared before <code>arr</code> has been &quot;magically&quot; changed to the character 'd', which is the last letter in &quot;world&quot;.</p>
+<p>To understand this, we need to know how the program allocate spaces in stack. Most of the operating system will allocate stack from high address to low address. The stack in our program will be something like this:<br>
+<img src="https://bofeng.github.io/post-images/1587244468586.png" alt="" loading="lazy"></p>
+<p>When we input &quot;hello world&quot;, program will try to save this string from <code>arr[0]</code>, like this:<br>
+<img src="https://bofeng.github.io/post-images/1587244621171.png" alt="" loading="lazy"></p>
+<p>So technically we still have 11 slots, but the last one is not for our array, it is the space for our variable <code>c</code>. When the program saved the whole string, it put the last letter 'd' in our <code>char c</code> slot - that's why after input our varaible <code>c</code> has been modified to <code>d</code> ! This kind bug is quite dangerous and not easy to find!</p>
+<h3 id="the-solution">The solution</h3>
+<p>The alternative function we should use is <code>fgets</code>:</p>
+<pre><code class="language-c">char* fgets(char *string, int length, FILE * stream);
+</code></pre>
+<p>So we can change our code to:</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main() {
+    char c = 'c';
+    char arr[10] = {0};
+    printf(&quot;before gets: variable c is %c\n&quot;, c);
+    fgets(arr, 10, stdin);
+    printf(&quot;after gets: variable c is %c\n&quot;, c);
+    return 0;
+}
+</code></pre>
+<p>Use <code>gcc</code> to compile and run it:</p>
+<pre><code class="language-bash">$ gcc main.c -o main
+$ ./main
+before gets: variable c is c
+hello world
+after gets: variable c is c
+</code></pre>
+<p>Two things changed here: 1) when compile, there is no warning info printed out 2) although our &quot;hello world&quot; contains 11 letters, our program didn't crash anymore and our variable <code>c</code> hadn't been overwritten.</p>
+<h3 id="reference">Reference</h3>
+<ul>
+<li><a href="https://stackoverflow.com/questions/1345670/stack-smashing-detected">stack smashing detected</a></li>
+<li><a href="https://en.wikipedia.org/wiki/C_file_input/output#gets">gets is deprecated in c99</a></li>
+<li><a href="https://en.wikibooks.org/wiki/C_Programming/stdio.h/fgets">fgets function</a></li>
+</ul>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Gnome display settings enable multiple scales]]></title>
         <id>https://bofeng.github.io/post/gnome-display-settings-enable-multiple-scales/</id>
@@ -753,41 +851,6 @@ print(crypt.crypt(&quot;myloginpwd&quot;, &quot;$6$MksUWINOmX.9ZXyP&quot;))
 $6$MksUWINOmX.9ZXyP$yjO8RvJj5i9.G/mOx7ZA3npdX05iv5Z07k3zI/02LMBjPE01e8hUlVhMNNpzRIWG1n0n6flWZGgW2T/LsZGRT0
 </code></pre>
 <p>可以看到crypt后的字符串和shadow中的相同，说明密码(myloginpwd)是正确的。</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Godaddy SSL Cert + Nginx]]></title>
-        <id>https://bofeng.github.io/post/godaddy-ssl-cert-nginx/</id>
-        <link href="https://bofeng.github.io/post/godaddy-ssl-cert-nginx/">
-        </link>
-        <updated>2019-03-31T06:57:44.000Z</updated>
-        <summary type="html"><![CDATA[<p>When download SSL certificate from Godaddy, you will have 3 files like:</p>
-<ul>
-<li>gd_bundle-g2-g1.crt</li>
-<li>c90e3e53c899df65.crt</li>
-<li>c90e3e53c899df65.pem</li>
-</ul>
-]]></summary>
-        <content type="html"><![CDATA[<p>When download SSL certificate from Godaddy, you will have 3 files like:</p>
-<ul>
-<li>gd_bundle-g2-g1.crt</li>
-<li>c90e3e53c899df65.crt</li>
-<li>c90e3e53c899df65.pem</li>
-</ul>
-<!-- more -->
-<p>The content in <code>c90e3e53c899df65.pem</code> and <code>c90e3e53c899df65.crt</code> are the same (not sure why Godaddy gave same file with different extentions), remember the <code>.pem</code> file is NOT your Certificate Key file, only YOU have the your own key file! So if you are updating SSL cert for your website, YOU DON'T NEED TO CHANGE THE CERTIFICATE KEY FILE (unless you want to generate a totally new certificate from godaddy).</p>
-<p>Now let's handle those 2 <code>.crt</code> files. To config it properly with Nginx, first combine those 2 files:</p>
-<pre><code class="language-bash">cat c90e3e53c899df65.crt gd_bundle-g2-g1.crt &gt;&gt; mysite_bundle.crt
-</code></pre>
-<p>Then use it in Nginx:</p>
-<pre><code>ssl_certificate /path/to/mysite_bundle.crt;
-ssl_certificate_key /path/to/mysite.key;
-</code></pre>
-<p>If you are using Apache, it will be:</p>
-<pre><code>SSLCertificateFile /path/to/mysite_bundle.crt
-SSLCertificateKeyFile /path/to/mysite.key
-</code></pre>
-<p>If you don't do the combination and just use <code>c90e3e53c899df65.crt</code> as the site certificate file, then when you browse the website, it is still good, but when you use python to request url in this site, it will throw an exception like SSL cert is invalid. If you combine those 2 crt files first then use the combined file, the python exception will be gone.</p>
 ]]></content>
     </entry>
 </feed>

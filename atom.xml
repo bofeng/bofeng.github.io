@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://bofeng.github.io</id>
     <title>0xBF</title>
-    <updated>2020-04-18T21:50:59.184Z</updated>
+    <updated>2020-04-18T21:52:42.476Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://bofeng.github.io"/>
     <link rel="self" href="https://bofeng.github.io/atom.xml"/>
@@ -10,30 +10,11 @@
     <icon>https://bofeng.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, 0xBF</rights>
     <entry>
-        <title type="html"><![CDATA[Gnome display settings enable multiple scales]]></title>
-        <id>https://bofeng.github.io/post/gnome-display-settings-enable-multiple-scales/</id>
-        <link href="https://bofeng.github.io/post/gnome-display-settings-enable-multiple-scales/">
-        </link>
-        <updated>2020-04-16T21:18:15.000Z</updated>
-        <content type="html"><![CDATA[<p>I was settings up my new System76 laptop (my current Pop!_OS version is based on ubuntu 19.10), the default 1920x1680 resolution is too small for me in the display settings. So I want to make it bigger. There is a &quot;Scale&quot; settings below, and it only has 2 options: 100%, 200%</p>
-<p>100% is too small for me, 200% is too big.</p>
-<p>To enable other scales, open terminal run command:</p>
-<pre><code class="language-bash">$ gsettings set org.gnome.mutter experimental-features &quot;['x11-randr-fractional-scaling']&quot;
-</code></pre>
-<p>Then back to display settings, you will be able to see other scale values: 125%, 150% and 175%.</p>
-<figure data-type="image" tabindex="1"><img src="https://bofeng.github.io/post-images/1587158852197.png" alt="" loading="lazy"></figure>
-<h3 id="reference">Reference:</h3>
-<ul>
-<li><a href="https://www.linuxuprising.com/2019/04/how-to-enable-hidpi-fractional-scaling.html">https://www.linuxuprising.com/2019/04/how-to-enable-hidpi-fractional-scaling.html</a></li>
-</ul>
-]]></content>
-    </entry>
-    <entry>
         <title type="html"><![CDATA[Why there is no "gets" function in C standard library?]]></title>
         <id>https://bofeng.github.io/post/why-there-is-no-gets-function-in-c-standard-library/</id>
         <link href="https://bofeng.github.io/post/why-there-is-no-gets-function-in-c-standard-library/">
         </link>
-        <updated>2020-04-16T20:39:49.000Z</updated>
+        <updated>2020-04-18T08:39:49.000Z</updated>
         <content type="html"><![CDATA[<p>If you are new to learn C program, you may find there are many functions like &quot;getc&quot;, &quot;putc&quot;, &quot;getchar&quot;, &quot;putchar&quot;, &quot;fgets&quot;, &quot;fputs&quot; : every &quot;put&quot; function comes with a corresponding &quot;get&quot; function. But there is a &quot;puts&quot; function while no &quot;gets&quot; function. Why?</p>
 <p>Well, the short anwer is, the &quot;gets&quot; function was there before in C89 standard, then it got deprecated in C99 and removed in C11. But let's see why it got removed.</p>
 <p>First let's check the function's declaration:</p>
@@ -123,6 +104,25 @@ after gets: variable c is c
 <li><a href="https://stackoverflow.com/questions/1345670/stack-smashing-detected">stack smashing detected</a></li>
 <li><a href="https://en.wikipedia.org/wiki/C_file_input/output#gets">gets is deprecated in c99</a></li>
 <li><a href="https://en.wikibooks.org/wiki/C_Programming/stdio.h/fgets">fgets function</a></li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Gnome display settings enable multiple scales]]></title>
+        <id>https://bofeng.github.io/post/gnome-display-settings-enable-multiple-scales/</id>
+        <link href="https://bofeng.github.io/post/gnome-display-settings-enable-multiple-scales/">
+        </link>
+        <updated>2020-04-16T21:18:15.000Z</updated>
+        <content type="html"><![CDATA[<p>I was settings up my new System76 laptop (my current Pop!_OS version is based on ubuntu 19.10), the default 1920x1680 resolution is too small for me in the display settings. So I want to make it bigger. There is a &quot;Scale&quot; settings below, and it only has 2 options: 100%, 200%</p>
+<p>100% is too small for me, 200% is too big.</p>
+<p>To enable other scales, open terminal run command:</p>
+<pre><code class="language-bash">$ gsettings set org.gnome.mutter experimental-features &quot;['x11-randr-fractional-scaling']&quot;
+</code></pre>
+<p>Then back to display settings, you will be able to see other scale values: 125%, 150% and 175%.</p>
+<figure data-type="image" tabindex="1"><img src="https://bofeng.github.io/post-images/1587158852197.png" alt="" loading="lazy"></figure>
+<h3 id="reference">Reference:</h3>
+<ul>
+<li><a href="https://www.linuxuprising.com/2019/04/how-to-enable-hidpi-fractional-scaling.html">https://www.linuxuprising.com/2019/04/how-to-enable-hidpi-fractional-scaling.html</a></li>
 </ul>
 ]]></content>
     </entry>

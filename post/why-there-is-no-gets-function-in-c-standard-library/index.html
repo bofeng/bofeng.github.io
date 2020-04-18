@@ -7,7 +7,7 @@
 <meta name="description" content="">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<link rel="shortcut icon" href="https://bofeng.github.io/favicon.ico?v=1587245940603">
+<link rel="shortcut icon" href="https://bofeng.github.io/favicon.ico?v=1587246398514">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
@@ -99,7 +99,7 @@ printf(&quot;Your input is: %s\n&quot;, buffer);
 </code></pre>
 <p>If we use <code>gcc</code> to compile the code, we can see the error something like this:</p>
 <blockquote>
-<p>main.c:(.text+0x164): warning: the `gets' function is dangerous and should not be used.</p>
+<p>main.c:(.text+0x164): warning: the 'gets' function is dangerous and should not be used.</p>
 </blockquote>
 <p>We can see using this function is <strong>dangerous</strong>, but if we ignore this warning and go ahead run our program: if we type &quot;hello world&quot; as our input, the program can correctly put this string out.</p>
 <p>So why is it dangerous? In our program we allocated a char array which has 20 slots, and our input &quot;hello world&quot; which are 11 characters, will be saved inside this array from position 0. Our &quot;hello world&quot; case works well, but now imagine what if our input has more than 20 characters, then we won't have enough space to save all of these characters:</p>
@@ -141,7 +141,7 @@ before gets: variable c is c
 hello world
 after gets: variable c is d
 </code></pre>
-<p>Ah, this time the program doesn't crash. But our varaible 'c' which is declared before <code>arr</code> has been &quot;magically&quot; changed to the character 'd', which is the last letter in &quot;world&quot;.</p>
+<p>Ah, this time the program doesn't crash. But our variable 'c' which is declared before <code>arr</code> has been &quot;magically&quot; changed to the character 'd', which is the last letter in &quot;world&quot;.</p>
 <p>To understand this, we need to know how the program allocate spaces in stack. Most of the operating system will allocate stack from high address to low address. The stack in our program will be something like this:<br>
 <img src="https://bofeng.github.io/post-images/1587244468586.png" alt="" loading="lazy"></p>
 <p>When we input &quot;hello world&quot;, program will try to save this string from <code>arr[0]</code>, like this:<br>
@@ -200,7 +200,7 @@ after gets: variable c is c
 
       <div class="sm-12 md-4 col sidebar">
   <div class="paper info-container">
-    <img src="https://bofeng.github.io/images/avatar.png?v=1587245940603" class="no-responsive avatar">
+    <img src="https://bofeng.github.io/images/avatar.png?v=1587246398514" class="no-responsive avatar">
     <div class="text-muted"></div>
     <div class="social-container">
       
@@ -396,27 +396,27 @@ after gets: variable c is c
     </div>
     <div class="row">
       
-        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge success">
           linux
         </a>
       
-        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge ">
           ubuntu
         </a>
       
-        <a href="https://bofeng.github.io/tag/Xp4pUvOV9/" class="badge ">
+        <a href="https://bofeng.github.io/tag/Xp4pUvOV9/" class="badge secondary">
           c
         </a>
       
-        <a href="https://bofeng.github.io/tag/MIOrvhB7a/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/MIOrvhB7a/" class="badge ">
           rocketchat
         </a>
       
-        <a href="https://bofeng.github.io/tag/B-lE5rjJQ/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/B-lE5rjJQ/" class="badge ">
           websocket
         </a>
       
-        <a href="https://bofeng.github.io/tag/4mqNg88O5/" class="badge success">
+        <a href="https://bofeng.github.io/tag/4mqNg88O5/" class="badge secondary">
           nginx
         </a>
       
@@ -424,11 +424,11 @@ after gets: variable c is c
           apache
         </a>
       
-        <a href="https://bofeng.github.io/tag/jmsnxeb0L/" class="badge ">
+        <a href="https://bofeng.github.io/tag/jmsnxeb0L/" class="badge secondary">
           webpy
         </a>
       
-        <a href="https://bofeng.github.io/tag/dTSYjKA1x/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/dTSYjKA1x/" class="badge ">
           passwd
         </a>
       
@@ -436,23 +436,23 @@ after gets: variable c is c
           godaddy
         </a>
       
-        <a href="https://bofeng.github.io/tag/Dr03KtaXl/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/Dr03KtaXl/" class="badge warning">
           raspi
         </a>
       
-        <a href="https://bofeng.github.io/tag/DfdCdjQwH/" class="badge success">
+        <a href="https://bofeng.github.io/tag/DfdCdjQwH/" class="badge ">
           vnc
         </a>
       
-        <a href="https://bofeng.github.io/tag/GLhh3mgC0/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/GLhh3mgC0/" class="badge success">
           logroute
         </a>
       
-        <a href="https://bofeng.github.io/tag/Y-U7pc_rs/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/Y-U7pc_rs/" class="badge secondary">
           uwsgi
         </a>
       
-        <a href="https://bofeng.github.io/tag/2ldRfwlTHj/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/2ldRfwlTHj/" class="badge ">
           ngrok
         </a>
       
@@ -460,15 +460,15 @@ after gets: variable c is c
           flask
         </a>
       
-        <a href="https://bofeng.github.io/tag/t46GgOmQJ/" class="badge success">
+        <a href="https://bofeng.github.io/tag/t46GgOmQJ/" class="badge warning">
           classmethod
         </a>
       
-        <a href="https://bofeng.github.io/tag/7tN2CvtD1N/" class="badge ">
+        <a href="https://bofeng.github.io/tag/7tN2CvtD1N/" class="badge secondary">
           staticmethod
         </a>
       
-        <a href="https://bofeng.github.io/tag/eSZ5lHy7P/" class="badge success">
+        <a href="https://bofeng.github.io/tag/eSZ5lHy7P/" class="badge warning">
           python
         </a>
       
@@ -476,19 +476,19 @@ after gets: variable c is c
           web
         </a>
       
-        <a href="https://bofeng.github.io/tag/vJnENzWsf/" class="badge ">
+        <a href="https://bofeng.github.io/tag/vJnENzWsf/" class="badge secondary">
           ssl
         </a>
       
-        <a href="https://bofeng.github.io/tag/dnoL5D0w-/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/dnoL5D0w-/" class="badge warning">
           mail
         </a>
       
-        <a href="https://bofeng.github.io/tag/yuo6OYefk4/" class="badge ">
+        <a href="https://bofeng.github.io/tag/yuo6OYefk4/" class="badge secondary">
           smtp
         </a>
       
-        <a href="https://bofeng.github.io/tag/GS8sncYwZ/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/GS8sncYwZ/" class="badge success">
           rsync
         </a>
       
@@ -496,7 +496,7 @@ after gets: variable c is c
           pypi
         </a>
       
-        <a href="https://bofeng.github.io/tag/LzDugb5gQm/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/LzDugb5gQm/" class="badge warning">
           cors
         </a>
       
@@ -504,15 +504,15 @@ after gets: variable c is c
           vim
         </a>
       
-        <a href="https://bofeng.github.io/tag/vLxhso05B/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/vLxhso05B/" class="badge success">
           strace
         </a>
       
-        <a href="https://bofeng.github.io/tag/IbPl9to7C/" class="badge success">
+        <a href="https://bofeng.github.io/tag/IbPl9to7C/" class="badge secondary">
           google
         </a>
       
-        <a href="https://bofeng.github.io/tag/X_VKuDyUs/" class="badge success">
+        <a href="https://bofeng.github.io/tag/X_VKuDyUs/" class="badge warning">
           opensource
         </a>
       
@@ -532,15 +532,15 @@ after gets: variable c is c
           github
         </a>
       
-        <a href="https://bofeng.github.io/tag/OLHLFT4if/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/OLHLFT4if/" class="badge success">
           ssh
         </a>
       
-        <a href="https://bofeng.github.io/tag/AWO0Br2y4/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/AWO0Br2y4/" class="badge secondary">
           scratch
         </a>
       
-        <a href="https://bofeng.github.io/tag/O0PlhyDUc/" class="badge success">
+        <a href="https://bofeng.github.io/tag/O0PlhyDUc/" class="badge warning">
           algorithm
         </a>
       
@@ -548,31 +548,31 @@ after gets: variable c is c
           jQuery
         </a>
       
-        <a href="https://bofeng.github.io/tag/3NETfISBbQ/" class="badge ">
+        <a href="https://bofeng.github.io/tag/3NETfISBbQ/" class="badge secondary">
           js
         </a>
       
-        <a href="https://bofeng.github.io/tag/4zLHN4PXY/" class="badge ">
+        <a href="https://bofeng.github.io/tag/4zLHN4PXY/" class="badge secondary">
           docker
         </a>
       
-        <a href="https://bofeng.github.io/tag/ROXx9algt/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/ROXx9algt/" class="badge secondary">
           opencourse
         </a>
       
-        <a href="https://bofeng.github.io/tag/1KJQkim0xD/" class="badge ">
+        <a href="https://bofeng.github.io/tag/1KJQkim0xD/" class="badge warning">
           course
         </a>
       
-        <a href="https://bofeng.github.io/tag/-Mmbm4s8hZ/" class="badge ">
+        <a href="https://bofeng.github.io/tag/-Mmbm4s8hZ/" class="badge success">
           education
         </a>
       
-        <a href="https://bofeng.github.io/tag/QibBEdubUA/" class="badge ">
+        <a href="https://bofeng.github.io/tag/QibBEdubUA/" class="badge success">
           chromebook
         </a>
       
-        <a href="https://bofeng.github.io/tag/rMdHe7zYUx/" class="badge success">
+        <a href="https://bofeng.github.io/tag/rMdHe7zYUx/" class="badge warning">
           iOS
         </a>
       
@@ -584,15 +584,15 @@ after gets: variable c is c
           hls
         </a>
       
-        <a href="https://bofeng.github.io/tag/ITnA4khP_/" class="badge ">
+        <a href="https://bofeng.github.io/tag/ITnA4khP_/" class="badge warning">
           protobuf
         </a>
       
-        <a href="https://bofeng.github.io/tag/5XAvbVu7Y/" class="badge success">
+        <a href="https://bofeng.github.io/tag/5XAvbVu7Y/" class="badge warning">
           loadbalance
         </a>
       
-        <a href="https://bofeng.github.io/tag/G6EOG9dUqx/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/G6EOG9dUqx/" class="badge warning">
           server
         </a>
       
@@ -604,11 +604,11 @@ after gets: variable c is c
           objc
         </a>
       
-        <a href="https://bofeng.github.io/tag/g_FfQMIOg/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/g_FfQMIOg/" class="badge warning">
           memcached
         </a>
       
-        <a href="https://bofeng.github.io/tag/eAw-5Salr/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/eAw-5Salr/" class="badge secondary">
           datamining
         </a>
       

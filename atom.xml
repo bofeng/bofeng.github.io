@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://bofeng.github.io</id>
     <title>0xBF</title>
-    <updated>2020-04-18T21:39:40.101Z</updated>
+    <updated>2020-04-18T21:46:43.579Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://bofeng.github.io"/>
     <link rel="self" href="https://bofeng.github.io/atom.xml"/>
@@ -14,7 +14,7 @@
         <id>https://bofeng.github.io/post/why-there-is-no-gets-function-in-c-standard-library/</id>
         <link href="https://bofeng.github.io/post/why-there-is-no-gets-function-in-c-standard-library/">
         </link>
-        <updated>2020-04-17T20:39:49.000Z</updated>
+        <updated>2020-04-17T08:39:49.000Z</updated>
         <content type="html"><![CDATA[<p>If you are new to learn C program, you may find there are many functions like &quot;getc&quot;, &quot;putc&quot;, &quot;getchar&quot;, &quot;putchar&quot;, &quot;fgets&quot;, &quot;fputs&quot; : every &quot;put&quot; function comes with a corresponding &quot;get&quot; function. But there is a &quot;puts&quot; function while no &quot;gets&quot; function. Why?</p>
 <p>Well, the short anwer is, the &quot;gets&quot; function was there before in C89 standard, then it got deprecated in C99 and removed in C11. But let's see why it got removed.</p>
 <p>First let's check the function's declaration:</p>
@@ -27,7 +27,7 @@ printf(&quot;Your input is: %s\n&quot;, buffer);
 </code></pre>
 <p>If we use <code>gcc</code> to compile the code, we can see the error something like this:</p>
 <blockquote>
-<p>main.c:(.text+0x164): warning: the `gets' function is dangerous and should not be used.</p>
+<p>main.c:(.text+0x164): warning: the 'gets' function is dangerous and should not be used.</p>
 </blockquote>
 <p>We can see using this function is <strong>dangerous</strong>, but if we ignore this warning and go ahead run our program: if we type &quot;hello world&quot; as our input, the program can correctly put this string out.</p>
 <p>So why is it dangerous? In our program we allocated a char array which has 20 slots, and our input &quot;hello world&quot; which are 11 characters, will be saved inside this array from position 0. Our &quot;hello world&quot; case works well, but now imagine what if our input has more than 20 characters, then we won't have enough space to save all of these characters:</p>
@@ -69,7 +69,7 @@ before gets: variable c is c
 hello world
 after gets: variable c is d
 </code></pre>
-<p>Ah, this time the program doesn't crash. But our varaible 'c' which is declared before <code>arr</code> has been &quot;magically&quot; changed to the character 'd', which is the last letter in &quot;world&quot;.</p>
+<p>Ah, this time the program doesn't crash. But our variable 'c' which is declared before <code>arr</code> has been &quot;magically&quot; changed to the character 'd', which is the last letter in &quot;world&quot;.</p>
 <p>To understand this, we need to know how the program allocate spaces in stack. Most of the operating system will allocate stack from high address to low address. The stack in our program will be something like this:<br>
 <img src="https://bofeng.github.io/post-images/1587244468586.png" alt="" loading="lazy"></p>
 <p>When we input &quot;hello world&quot;, program will try to save this string from <code>arr[0]</code>, like this:<br>

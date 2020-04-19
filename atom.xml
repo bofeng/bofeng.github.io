@@ -2,13 +2,28 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://bofeng.github.io</id>
     <title>0xBF</title>
-    <updated>2020-04-19T02:06:31.112Z</updated>
+    <updated>2020-04-19T02:07:40.088Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://bofeng.github.io"/>
     <link rel="self" href="https://bofeng.github.io/atom.xml"/>
     <logo>https://bofeng.github.io/images/avatar.png</logo>
     <icon>https://bofeng.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, 0xBF</rights>
+    <entry>
+        <title type="html"><![CDATA[How to add "startpage" as default search engine in Firefox?]]></title>
+        <id>https://bofeng.github.io/post/how-to-add-startpage-as-default-search-engine-in-firefox/</id>
+        <link href="https://bofeng.github.io/post/how-to-add-startpage-as-default-search-engine-in-firefox/">
+        </link>
+        <updated>2020-04-18T13:58:07.000Z</updated>
+        <content type="html"><![CDATA[<p><a href="startpage.com">StartPage</a> is a search engine will proxy your search to Google but without giving your data to it. In another word, it can give you the same result as Google but protect your privacy.</p>
+<p>It is really easy o make it as your default search engine in the address bar in Firefox. If you open the &quot;Perference&quot; in Firefox, and on the &quot;search&quot; part you will see a search engine list similar to this:</p>
+<figure data-type="image" tabindex="1"><img src="https://bofeng.github.io/post-images/1587261660967.png" alt="" loading="lazy"></figure>
+<p>So there is no &quot;Start Page&quot; there. You can now go to &quot;startpage.com&quot;, then on the right of the address bar, click the &quot;dot dot dot&quot; to see more options, from where you can see &quot;Add Search Engine&quot; option, simply click it.</p>
+<figure data-type="image" tabindex="2"><img src="https://bofeng.github.io/post-images/1587261742628.png" alt="" loading="lazy"></figure>
+<p>Now go back to the &quot;Preference&quot; page, in the &quot;search engine&quot; dropdown list, you can select &quot;Start Page&quot; as your default search engine. Next time, when you type some keyword in the address bar, Firefox will auto do the search in Start Page.</p>
+<figure data-type="image" tabindex="3"><img src="https://bofeng.github.io/post-images/1587261981425.png" alt="" loading="lazy"></figure>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Why there is no "gets" function in C standard library?]]></title>
         <id>https://bofeng.github.io/post/why-there-is-no-gets-function-in-c-standard-library/</id>
@@ -105,21 +120,6 @@ after gets: variable c is c
 <li><a href="https://en.wikipedia.org/wiki/C_file_input/output#gets">gets is deprecated in c99</a></li>
 <li><a href="https://en.wikibooks.org/wiki/C_Programming/stdio.h/fgets">fgets function</a></li>
 </ul>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[How to add "startpage" as default search engine in Firefox?]]></title>
-        <id>https://bofeng.github.io/post/how-to-add-startpage-as-default-search-engine-in-firefox/</id>
-        <link href="https://bofeng.github.io/post/how-to-add-startpage-as-default-search-engine-in-firefox/">
-        </link>
-        <updated>2020-04-18T01:58:07.000Z</updated>
-        <content type="html"><![CDATA[<p><a href="startpage.com">StartPage</a> is a search engine will proxy your search to Google but without giving your data to it. In another word, it can give you the same result as Google but protect your privacy.</p>
-<p>It is really easy o make it as your default search engine in the address bar in Firefox. If you open the &quot;Perference&quot; in Firefox, and on the &quot;search&quot; part you will see a search engine list similar to this:</p>
-<figure data-type="image" tabindex="1"><img src="https://bofeng.github.io/post-images/1587261660967.png" alt="" loading="lazy"></figure>
-<p>So there is no &quot;Start Page&quot; there. You can now go to &quot;startpage.com&quot;, then on the right of the address bar, click the &quot;dot dot dot&quot; to see more options, from where you can see &quot;Add Search Engine&quot; option, simply click it.</p>
-<figure data-type="image" tabindex="2"><img src="https://bofeng.github.io/post-images/1587261742628.png" alt="" loading="lazy"></figure>
-<p>Now go back to the &quot;Preference&quot; page, in the &quot;search engine&quot; dropdown list, you can select &quot;Start Page&quot; as your default search engine. Next time, when you type some keyword in the address bar, Firefox will auto do the search in Start Page.</p>
-<figure data-type="image" tabindex="3"><img src="https://bofeng.github.io/post-images/1587261981425.png" alt="" loading="lazy"></figure>
 ]]></content>
     </entry>
     <entry>

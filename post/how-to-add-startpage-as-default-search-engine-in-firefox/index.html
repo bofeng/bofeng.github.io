@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>Why there is no &#34;gets&#34; function in C standard library? | 0xBF</title>
+<title>How to add &#34;startpage&#34; as default search engine in Firefox? | 0xBF</title>
 <meta name="description" content="">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -80,115 +80,27 @@
       <div class="sm-12 md-8 col">
         <div class="paper">
           <article class="article">
-            <h1>Why there is no &#34;gets&#34; function in C standard library?</h1>
+            <h1>How to add &#34;startpage&#34; as default search engine in Firefox?</h1>
             <p class="article-meta">
               2020-04-18
               
-                <a href="https://bofeng.github.io/tag/2SkWf0yxm/" class="badge secondary">
-                  gcc
+                <a href="https://bofeng.github.io/tag/49HWll9Mi/" class="badge success">
+                  firefox
                 </a>
               
-                <a href="https://bofeng.github.io/tag/Xp4pUvOV9/" class="badge success">
-                  c
-                </a>
-              
-                <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge warning">
-                  linux
+                <a href="https://bofeng.github.io/tag/GVVsxSvsE-/" class="badge ">
+                  privacy
                 </a>
               
             </p>
             
             <div class="post-content">
-              <p>If you are new to learn C program, you may find there are many functions like &quot;getc&quot;, &quot;putc&quot;, &quot;getchar&quot;, &quot;putchar&quot;, &quot;fgets&quot;, &quot;fputs&quot; : every &quot;put&quot; function comes with a corresponding &quot;get&quot; function. But there is a &quot;puts&quot; function while no &quot;gets&quot; function. Why?</p>
-<p>Well, the short anwer is, the &quot;gets&quot; function was there before in C89 standard, then it got deprecated in C99 and removed in C11. But let's see why it got removed.</p>
-<p>First let's check the function's declaration:</p>
-<pre><code class="language-c">char* gets(char* str)
-</code></pre>
-<p>Basically we pass a pre-allocated &quot;str&quot; buffer to this function, <code>gets</code> will get user's input and save it into this buffer. So we can write some code like this:</p>
-<pre><code class="language-c">char buffer[20] = {0};
-gets(buffer);
-printf(&quot;Your input is: %s\n&quot;, buffer);
-</code></pre>
-<p>If we use <code>gcc</code> to compile the code, we can see the error something like this:</p>
-<blockquote>
-<p>main.c:(.text+0x164): warning: the 'gets' function is dangerous and should not be used.</p>
-</blockquote>
-<p>We can see using this function is <strong>dangerous</strong>, but if we ignore this warning and go ahead run our program: if we type &quot;hello world&quot; as our input, the program can correctly put this string out.</p>
-<p>So why is it dangerous? In our program we allocated a char array which has 20 slots, and our input &quot;hello world&quot; which are 11 characters, will be saved inside this array from position 0. Our &quot;hello world&quot; case works well, but now imagine what if our input has more than 20 characters, then we won't have enough space to save all of these characters:</p>
-<pre><code class="language-bash">$ ./main
-hello world hello world hello world
-Your input is: hello world hello world hello world
-*** stack smashing detected ***: &lt;unknown&gt; terminated
-Aborted (core dumped)
-</code></pre>
-<p>In this case, since we don't have enough space to save user's input, the program crashed.</p>
-<p>Sometimes this may cause bug that harder to find, suppose we have code like this:</p>
-<pre><code class="language-c">#include &lt;stdio.h&gt;
-
-int main() {
-    char c = 'c';
-    char arr[10] = {0};
-    printf(&quot;before gets: variable c is %c\n&quot;, c);
-    gets(arr);
-    printf(&quot;after gets: variable c is %c\n&quot;, c);
-    return 0;
-}
-</code></pre>
-<p>Before we compile and run the code, guess what the output would be if in the <code>gets</code> step, we type &quot;hello world&quot;.</p>
-<p>Your guess might be the program will crash since &quot;hello world&quot; in total are 11 characters (including the white-space in the middel) but our allocated <code>arr</code> only have 10 slots. Well, you are not wrong with the <strong>modern compiler</strong>, by that I mean, if we compile the code and run it:</p>
-<pre><code class="language-bash">$ gcc main.c -o main
-main.c:(.text+0x51): warning: the 'gets' function is dangerous and should not be used.
-$ ./main
-before gets: variable c is c
-hello world
-after gets: variable c is c
-*** stack smashing detected ***: &lt;unknown&gt; terminated
-Aborted (core dumped)
-</code></pre>
-<p>But in the old compiler, you might won't have this crashed. The modern <code>gcc</code> will compile with a default &quot;stack-protector&quot; turned on. Let's try to turn it off then run again:</p>
-<pre><code class="language-bash">$ gcc main.c -fno-stack-protector -o main
-main.c:(.text+0x42): warning: the 'gets' function is dangerous and should not be used.
-$ ./main
-before gets: variable c is c
-hello world
-after gets: variable c is d
-</code></pre>
-<p>Ah, this time the program doesn't crash. But our variable 'c' which is declared before <code>arr</code> has been &quot;magically&quot; changed to the character 'd', which is the last letter in &quot;world&quot;.</p>
-<p>To understand this, we need to know how the program allocate spaces in stack. Most of the operating system will allocate stack from high address to low address. The stack in our program will be something like this:<br>
-<img src="https://bofeng.github.io/post-images/1587244468586.png" alt="" loading="lazy"></p>
-<p>When we input &quot;hello world&quot;, program will try to save this string from <code>arr[0]</code>, like this:<br>
-<img src="https://bofeng.github.io/post-images/1587244621171.png" alt="" loading="lazy"></p>
-<p>So technically we still have 11 slots, but the last one is not for our array, it is the space for our variable <code>c</code>. When the program saved the whole string, it put the last letter 'd' in our <code>char c</code> slot - that's why after input our varaible <code>c</code> has been modified to <code>d</code> ! This kind bug is quite dangerous and not easy to find!</p>
-<h3 id="the-solution">The solution</h3>
-<p>The alternative function we should use is <code>fgets</code>:</p>
-<pre><code class="language-c">char* fgets(char *string, int length, FILE * stream);
-</code></pre>
-<p>So we can change our code to:</p>
-<pre><code class="language-c">#include &lt;stdio.h&gt;
-
-int main() {
-    char c = 'c';
-    char arr[10] = {0};
-    printf(&quot;before gets: variable c is %c\n&quot;, c);
-    fgets(arr, 10, stdin);
-    printf(&quot;after gets: variable c is %c\n&quot;, c);
-    return 0;
-}
-</code></pre>
-<p>Use <code>gcc</code> to compile and run it:</p>
-<pre><code class="language-bash">$ gcc main.c -o main
-$ ./main
-before gets: variable c is c
-hello world
-after gets: variable c is c
-</code></pre>
-<p>Two things changed here: 1) when compile, there is no warning info printed out 2) although our &quot;hello world&quot; contains 11 letters, our program didn't crash anymore and our variable <code>c</code> hadn't been overwritten.</p>
-<h3 id="reference">Reference</h3>
-<ul>
-<li><a href="https://stackoverflow.com/questions/1345670/stack-smashing-detected">stack smashing detected</a></li>
-<li><a href="https://en.wikipedia.org/wiki/C_file_input/output#gets">gets is deprecated in c99</a></li>
-<li><a href="https://en.wikibooks.org/wiki/C_Programming/stdio.h/fgets">fgets function</a></li>
-</ul>
+              <p><a href="startpage.com">StartPage</a> is a search engine will proxy your search to Google but without giving your data to it. In another word, it can give you the same result as Google but protect your privacy.</p>
+<p>It is really easy o make it as your default search engine in the address bar in Firefox. If you open the &quot;Perference&quot; in Firefox, and on the &quot;search&quot; part you will see a search engine list similar to this:</p>
+<figure data-type="image" tabindex="1"><img src="https://bofeng.github.io/post-images/1587261660967.png" alt="" loading="lazy"></figure>
+<p>So there is no &quot;Start Page&quot; there. You can now go to &quot;startpage.com&quot;, then on the right of the address bar, click the &quot;dot dot dot&quot; to see more options, from where you can see &quot;Add Search Engine&quot; option, simply click it.</p>
+<figure data-type="image" tabindex="2"><img src="https://bofeng.github.io/post-images/1587261742628.png" alt="" loading="lazy"></figure>
+<p>Now go back to the &quot;Preference&quot; page, in the &quot;search engine&quot; dropdown list, you can select &quot;Start Page&quot; as your default search engine. Next time, when you type some keyword in the address bar, Firefox will auto do the search in Start Page.</p>
 
             </div>
           </article>
@@ -199,9 +111,9 @@ after gets: variable c is c
               <div class="next">
                 下一篇
               </div>
-              <a href="https://bofeng.github.io/post/gnome-display-settings-enable-multiple-scales/">
+              <a href="https://bofeng.github.io/post/why-there-is-no-gets-function-in-c-standard-library/">
                 <h3 class="post-title">
-                  Gnome display settings enable multiple scales
+                  Why there is no &#34;gets&#34; function in C standard library?
                 </h3>
               </a>
             </div>
@@ -414,7 +326,7 @@ after gets: variable c is c
           firefox
         </a>
       
-        <a href="https://bofeng.github.io/tag/GVVsxSvsE-/" class="badge success">
+        <a href="https://bofeng.github.io/tag/GVVsxSvsE-/" class="badge warning">
           privacy
         </a>
       
@@ -426,7 +338,7 @@ after gets: variable c is c
           c
         </a>
       
-        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge ">
+        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge success">
           linux
         </a>
       
@@ -434,27 +346,27 @@ after gets: variable c is c
           ubuntu
         </a>
       
-        <a href="https://bofeng.github.io/tag/MIOrvhB7a/" class="badge success">
+        <a href="https://bofeng.github.io/tag/MIOrvhB7a/" class="badge ">
           rocketchat
         </a>
       
-        <a href="https://bofeng.github.io/tag/B-lE5rjJQ/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/B-lE5rjJQ/" class="badge secondary">
           websocket
         </a>
       
-        <a href="https://bofeng.github.io/tag/4mqNg88O5/" class="badge ">
+        <a href="https://bofeng.github.io/tag/4mqNg88O5/" class="badge success">
           nginx
         </a>
       
-        <a href="https://bofeng.github.io/tag/ldB2Nthcy/" class="badge success">
+        <a href="https://bofeng.github.io/tag/ldB2Nthcy/" class="badge ">
           apache
         </a>
       
-        <a href="https://bofeng.github.io/tag/jmsnxeb0L/" class="badge ">
+        <a href="https://bofeng.github.io/tag/jmsnxeb0L/" class="badge success">
           webpy
         </a>
       
-        <a href="https://bofeng.github.io/tag/dTSYjKA1x/" class="badge ">
+        <a href="https://bofeng.github.io/tag/dTSYjKA1x/" class="badge success">
           passwd
         </a>
       
@@ -470,15 +382,15 @@ after gets: variable c is c
           vnc
         </a>
       
-        <a href="https://bofeng.github.io/tag/GLhh3mgC0/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/GLhh3mgC0/" class="badge success">
           logroute
         </a>
       
-        <a href="https://bofeng.github.io/tag/Y-U7pc_rs/" class="badge success">
+        <a href="https://bofeng.github.io/tag/Y-U7pc_rs/" class="badge secondary">
           uwsgi
         </a>
       
-        <a href="https://bofeng.github.io/tag/2ldRfwlTHj/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/2ldRfwlTHj/" class="badge ">
           ngrok
         </a>
       
@@ -490,15 +402,15 @@ after gets: variable c is c
           classmethod
         </a>
       
-        <a href="https://bofeng.github.io/tag/7tN2CvtD1N/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/7tN2CvtD1N/" class="badge success">
           staticmethod
         </a>
       
-        <a href="https://bofeng.github.io/tag/eSZ5lHy7P/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/eSZ5lHy7P/" class="badge ">
           python
         </a>
       
-        <a href="https://bofeng.github.io/tag/8bPDgHSAN/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/8bPDgHSAN/" class="badge success">
           web
         </a>
       
@@ -510,31 +422,31 @@ after gets: variable c is c
           mail
         </a>
       
-        <a href="https://bofeng.github.io/tag/yuo6OYefk4/" class="badge ">
+        <a href="https://bofeng.github.io/tag/yuo6OYefk4/" class="badge success">
           smtp
         </a>
       
-        <a href="https://bofeng.github.io/tag/GS8sncYwZ/" class="badge ">
+        <a href="https://bofeng.github.io/tag/GS8sncYwZ/" class="badge success">
           rsync
         </a>
       
-        <a href="https://bofeng.github.io/tag/EXump4cPm/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/EXump4cPm/" class="badge ">
           pypi
         </a>
       
-        <a href="https://bofeng.github.io/tag/LzDugb5gQm/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/LzDugb5gQm/" class="badge ">
           cors
         </a>
       
-        <a href="https://bofeng.github.io/tag/rLcaXQkmK/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/rLcaXQkmK/" class="badge ">
           vim
         </a>
       
-        <a href="https://bofeng.github.io/tag/vLxhso05B/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/vLxhso05B/" class="badge ">
           strace
         </a>
       
-        <a href="https://bofeng.github.io/tag/IbPl9to7C/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/IbPl9to7C/" class="badge ">
           google
         </a>
       
@@ -542,11 +454,11 @@ after gets: variable c is c
           opensource
         </a>
       
-        <a href="https://bofeng.github.io/tag/JPaKbEpxsK/" class="badge ">
+        <a href="https://bofeng.github.io/tag/JPaKbEpxsK/" class="badge secondary">
           license
         </a>
       
-        <a href="https://bofeng.github.io/tag/0uGMCxZDs/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/0uGMCxZDs/" class="badge warning">
           mkdocs
         </a>
       
@@ -554,23 +466,23 @@ after gets: variable c is c
           cloudflare
         </a>
       
-        <a href="https://bofeng.github.io/tag/XlycwU8qXZ/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/XlycwU8qXZ/" class="badge success">
           github
         </a>
       
-        <a href="https://bofeng.github.io/tag/OLHLFT4if/" class="badge ">
+        <a href="https://bofeng.github.io/tag/OLHLFT4if/" class="badge secondary">
           ssh
         </a>
       
-        <a href="https://bofeng.github.io/tag/AWO0Br2y4/" class="badge ">
+        <a href="https://bofeng.github.io/tag/AWO0Br2y4/" class="badge success">
           scratch
         </a>
       
-        <a href="https://bofeng.github.io/tag/O0PlhyDUc/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/O0PlhyDUc/" class="badge success">
           algorithm
         </a>
       
-        <a href="https://bofeng.github.io/tag/O0zRGJ6aD/" class="badge ">
+        <a href="https://bofeng.github.io/tag/O0zRGJ6aD/" class="badge success">
           jQuery
         </a>
       
@@ -578,15 +490,15 @@ after gets: variable c is c
           js
         </a>
       
-        <a href="https://bofeng.github.io/tag/4zLHN4PXY/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/4zLHN4PXY/" class="badge secondary">
           docker
         </a>
       
-        <a href="https://bofeng.github.io/tag/ROXx9algt/" class="badge success">
+        <a href="https://bofeng.github.io/tag/ROXx9algt/" class="badge warning">
           opencourse
         </a>
       
-        <a href="https://bofeng.github.io/tag/1KJQkim0xD/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/1KJQkim0xD/" class="badge success">
           course
         </a>
       
@@ -594,11 +506,11 @@ after gets: variable c is c
           education
         </a>
       
-        <a href="https://bofeng.github.io/tag/QibBEdubUA/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/QibBEdubUA/" class="badge success">
           chromebook
         </a>
       
-        <a href="https://bofeng.github.io/tag/rMdHe7zYUx/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/rMdHe7zYUx/" class="badge ">
           iOS
         </a>
       
@@ -606,11 +518,11 @@ after gets: variable c is c
           life
         </a>
       
-        <a href="https://bofeng.github.io/tag/ypaP9jx_V/" class="badge success">
+        <a href="https://bofeng.github.io/tag/ypaP9jx_V/" class="badge ">
           hls
         </a>
       
-        <a href="https://bofeng.github.io/tag/ITnA4khP_/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/ITnA4khP_/" class="badge ">
           protobuf
         </a>
       
@@ -626,11 +538,11 @@ after gets: variable c is c
           iPhone
         </a>
       
-        <a href="https://bofeng.github.io/tag/I7SG4keW3/" class="badge success">
+        <a href="https://bofeng.github.io/tag/I7SG4keW3/" class="badge secondary">
           objc
         </a>
       
-        <a href="https://bofeng.github.io/tag/g_FfQMIOg/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/g_FfQMIOg/" class="badge success">
           memcached
         </a>
       

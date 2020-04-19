@@ -2,13 +2,27 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://bofeng.github.io</id>
     <title>0xBF</title>
-    <updated>2020-04-18T21:52:42.476Z</updated>
+    <updated>2020-04-19T02:03:55.801Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://bofeng.github.io"/>
     <link rel="self" href="https://bofeng.github.io/atom.xml"/>
     <logo>https://bofeng.github.io/images/avatar.png</logo>
     <icon>https://bofeng.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, 0xBF</rights>
+    <entry>
+        <title type="html"><![CDATA[How to add "startpage" as default search engine in Firefox?]]></title>
+        <id>https://bofeng.github.io/post/how-to-add-startpage-as-default-search-engine-in-firefox/</id>
+        <link href="https://bofeng.github.io/post/how-to-add-startpage-as-default-search-engine-in-firefox/">
+        </link>
+        <updated>2020-04-18T13:58:07.000Z</updated>
+        <content type="html"><![CDATA[<p><a href="startpage.com">StartPage</a> is a search engine will proxy your search to Google but without giving your data to it. In another word, it can give you the same result as Google but protect your privacy.</p>
+<p>It is really easy o make it as your default search engine in the address bar in Firefox. If you open the &quot;Perference&quot; in Firefox, and on the &quot;search&quot; part you will see a search engine list similar to this:</p>
+<figure data-type="image" tabindex="1"><img src="https://bofeng.github.io/post-images/1587261660967.png" alt="" loading="lazy"></figure>
+<p>So there is no &quot;Start Page&quot; there. You can now go to &quot;startpage.com&quot;, then on the right of the address bar, click the &quot;dot dot dot&quot; to see more options, from where you can see &quot;Add Search Engine&quot; option, simply click it.</p>
+<figure data-type="image" tabindex="2"><img src="https://bofeng.github.io/post-images/1587261742628.png" alt="" loading="lazy"></figure>
+<p>Now go back to the &quot;Preference&quot; page, in the &quot;search engine&quot; dropdown list, you can select &quot;Start Page&quot; as your default search engine. Next time, when you type some keyword in the address bar, Firefox will auto do the search in Start Page.</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Why there is no "gets" function in C standard library?]]></title>
         <id>https://bofeng.github.io/post/why-there-is-no-gets-function-in-c-standard-library/</id>
@@ -825,32 +839,6 @@ server {
 <li>https://www.nginx.com/blog/websocket-nginx/</li>
 <li>https://stackoverflow.com/questions/12102110/nginx-to-reverse-proxy-websockets-and-enable-ssl-wss</li>
 </ul>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[passwd & shadow]]></title>
-        <id>https://bofeng.github.io/post/passwd-and-shadow/</id>
-        <link href="https://bofeng.github.io/post/passwd-and-shadow/">
-        </link>
-        <updated>2019-04-06T18:59:11.000Z</updated>
-        <summary type="html"><![CDATA[<p>Linux user's password is saved in <code>/etc/shadow</code> file, format like:</p>
-]]></summary>
-        <content type="html"><![CDATA[<p>Linux user's password is saved in <code>/etc/shadow</code> file, format like:</p>
-<!-- more -->
-<pre><code class="language-bash">root:$6$MksUWINOmX.9ZXyP$yjO8RvJj5i9.G/mOx7ZA3npdX05iv5Z07k3zI/02LMBjPE01e8hUlVhMNNpzRIWG1n0n6flWZGgW2T/LsZGRT0:17885:0:99999:7:::
-</code></pre>
-<p>第一个字段是username, <code>$6</code> 是hash method，6表示SHA-512, <code>$MksUWINOmX.9ZXyP</code>是SALT。 <code>$yjO8RvJj5i9.G/mOx7ZA...WZGgW2T/LsZGRT0</code> 是加密后的字符串。</p>
-<p>当用户使用<code>passwd</code>命令时，会将encrypted后的密码存入<code>/etc/shadow</code>文件。<code>/etc/shadow</code>文件是只有root可读可写的，那为什么普通用户也可以运行passwd命令写入此文件？这是因为passwd的&quot;设置用户运行位&quot;被set了。</p>
-<pre><code class="language-bash">$ ls -alh /usr/bin/passwd
--rwsr-xr-x 1 root root 59K Jan 25  2018 passwd
-</code></pre>
-<p>注意上面的rws中的s，表示不论是谁运行passwd，将运行的用户设置为此文件的拥有用户（也就是root），所以即使当普通用户运行passwd时，用<code>ps axu | grep passwd</code>也可以看到实际的运行用户是root。</p>
-<p>Python验证登录：</p>
-<pre><code class="language-python">import crypt
-print(crypt.crypt(&quot;myloginpwd&quot;, &quot;$6$MksUWINOmX.9ZXyP&quot;))
-$6$MksUWINOmX.9ZXyP$yjO8RvJj5i9.G/mOx7ZA3npdX05iv5Z07k3zI/02LMBjPE01e8hUlVhMNNpzRIWG1n0n6flWZGgW2T/LsZGRT0
-</code></pre>
-<p>可以看到crypt后的字符串和shadow中的相同，说明密码(myloginpwd)是正确的。</p>
 ]]></content>
     </entry>
 </feed>

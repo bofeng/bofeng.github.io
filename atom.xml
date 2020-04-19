@@ -2,13 +2,32 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://bofeng.github.io</id>
     <title>0xBF</title>
-    <updated>2020-04-19T02:07:40.088Z</updated>
+    <updated>2020-04-19T23:52:05.499Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://bofeng.github.io"/>
     <link rel="self" href="https://bofeng.github.io/atom.xml"/>
     <logo>https://bofeng.github.io/images/avatar.png</logo>
     <icon>https://bofeng.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, 0xBF</rights>
+    <entry>
+        <title type="html"><![CDATA[Copy file content to clipboard in terminal]]></title>
+        <id>https://bofeng.github.io/post/copy-file-content-to-clipboard-in-terminal/</id>
+        <link href="https://bofeng.github.io/post/copy-file-content-to-clipboard-in-terminal/">
+        </link>
+        <updated>2020-04-19T11:45:32.000Z</updated>
+        <content type="html"><![CDATA[<p>In Mac you can use <code>pbcopy</code>:</p>
+<pre><code class="language-bash">$ pbcopy &lt; hello.txt
+</code></pre>
+<p>In Linux which is using X11 (I am using ubuntu), you can use <code>xsel</code> command:</p>
+<pre><code class="language-bash">$ sudo apt install xsel
+$ xsel -b &lt; hello.txt
+</code></pre>
+<p>To copy some program's output to clipboard, we can use pipe:</p>
+<pre><code class="language-bash">$ date | sel -b
+</code></pre>
+<p>Then if you use &quot;ctrl-v&quot;, you will see the copied date.</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[How to add "startpage" as default search engine in Firefox?]]></title>
         <id>https://bofeng.github.io/post/how-to-add-startpage-as-default-search-engine-in-firefox/</id>
@@ -787,58 +806,6 @@ deploying your app... deployed!
 <h3 id="reference">Reference</h3>
 <ul>
 <li><a href="https://github.com/websockets/ws/issues/1598#issuecomment-504794623">https://github.com/websockets/ws/issues/1598#issuecomment-504794623</a></li>
-</ul>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Proxy Websocket Configuration in Apache and Nginx]]></title>
-        <id>https://bofeng.github.io/post/proxy-websocket-configuration-in-apache-and-nginx/</id>
-        <link href="https://bofeng.github.io/post/proxy-websocket-configuration-in-apache-and-nginx/">
-        </link>
-        <updated>2019-12-06T06:53:23.000Z</updated>
-        <content type="html"><![CDATA[<p>Proxy websocket to backend application.</p>
-<h3 id="apache">Apache:</h3>
-<p>First enable <code>proxy_wstunnel.load</code> mod in mods-enabled folder:</p>
-<pre><code class="language-bash">cd /etc/apache2/mods-enabled
-ln -s ../mods-available/proxy_wstunnel.load ./
-</code></pre>
-<p>Assume your backend websocket application running at port 8765, and the client side needs to connect to <code>ws://yourwebsite.com/ws/</code>.</p>
-<p>In your site config file, add:</p>
-<pre><code class="language-apache">    ProxyRequests off
-    ProxyPass /ws/ ws://localhost:8765/ retry=1
-    ProxyPassReverse /ws/ ws://localhost:8765/
-
-    RewriteEngine on
-    RewriteCond %{HTTP:UPGRADE} ^WebSocket$ [NC]
-    RewriteCond %{HTTP:CONNECTION} ^Upgrade$ [NC]
-    RewriteRule /ws/.* ws://localhost:8765%{REQUEST_URI} [P]
-</code></pre>
-<h3 id="nginx">Nginx</h3>
-<pre><code class="language-nginx">map $http_upgrade $connection_upgrade {
-    default upgrade;
-    '' close;
-}
-
-server {
-    listen 443 ssl;
-    server_name yourwebsite.com
-
-    # ...
-
-    location /ws/ {
-        proxy_pass &quot;http://localhost:8765/ws/&quot;;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection &quot;Upgrade&quot;;
-    }
-
-    # ...
-}
-</code></pre>
-<h3 id="reference">Reference</h3>
-<ul>
-<li>https://www.nginx.com/blog/websocket-nginx/</li>
-<li>https://stackoverflow.com/questions/12102110/nginx-to-reverse-proxy-websockets-and-enable-ssl-wss</li>
 </ul>
 ]]></content>
     </entry>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>ubuntu | 0xBF</title>
+<title>Copy file content to clipboard in terminal | 0xBF</title>
 <meta name="description" content="">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -22,6 +22,7 @@
 
   </head>
   <body>
+  
     <nav class="navbar border fixed split-nav">
   <div class="nav-brand">
     <h3><a href="https://bofeng.github.io">0xBF</a></h3>
@@ -78,196 +79,58 @@
     <div id="top" class="row site">
       <div class="sm-12 md-8 col">
         <div class="paper">
-          <h2 class="current-tag">标签: ubuntu</h2>
-          
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://bofeng.github.io/post/copy-file-content-to-clipboard-in-terminal/">Copy file content to clipboard in terminal</a>
-    </h2>
-    <p class="article-meta">
-      2020-04-19
-      
-        <a href="https://bofeng.github.io/tag/Gm69OgM6-/" class="badge secondary">
-          shell
-        </a>
-      
-        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge secondary">
-          linux
-        </a>
-      
-        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge secondary">
-          ubuntu
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://bofeng.github.io/post/copy-file-content-to-clipboard-in-terminal/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
+          <article class="article">
+            <h1>Copy file content to clipboard in terminal</h1>
+            <p class="article-meta">
+              2020-04-19
+              
+                <a href="https://bofeng.github.io/tag/Gm69OgM6-/" class="badge ">
+                  shell
+                </a>
+              
+                <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge ">
+                  linux
+                </a>
+              
+                <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge success">
+                  ubuntu
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <p>In Mac you can use <code>pbcopy</code>:</p>
+<pre><code class="language-bash">$ pbcopy &lt; hello.txt
+</code></pre>
+<p>In Linux which is using X11 (I am using ubuntu), you can use <code>xsel</code> command:</p>
+<pre><code class="language-bash">$ sudo apt install xsel
+$ xsel -b &lt; hello.txt
+</code></pre>
+<p>To copy some program's output to clipboard, we can use pipe:</p>
+<pre><code class="language-bash">$ date | sel -b
+</code></pre>
+<p>Then if you use &quot;ctrl-v&quot;, you will see the copied date.</p>
 
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://bofeng.github.io/post/gnome-display-settings-enable-multiple-scales/">Gnome display settings enable multiple scales</a>
-    </h2>
-    <p class="article-meta">
-      2020-04-16
-      
-        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge success">
-          linux
-        </a>
-      
-        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge success">
-          ubuntu
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://bofeng.github.io/post/gnome-display-settings-enable-multiple-scales/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://bofeng.github.io/post/config-postfix-as-a-send-only-smtp-server-on-ubuntu-1804/">Config Postfix as a Send-Only SMTP Server on Ubuntu 18.04</a>
-    </h2>
-    <p class="article-meta">
-      2019-02-21
-      
-        <a href="https://bofeng.github.io/tag/dnoL5D0w-/" class="badge success">
-          mail
-        </a>
-      
-        <a href="https://bofeng.github.io/tag/yuo6OYefk4/" class="badge warning">
-          smtp
-        </a>
-      
-        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge secondary">
-          linux
-        </a>
-      
-        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge secondary">
-          ubuntu
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      <p>每次新装服务器都忘了怎么安装这个mail sender的服务，记一下。</p>
-
-    </p>
-    <div class="row">
-      <a href="https://bofeng.github.io/post/config-postfix-as-a-send-only-smtp-server-on-ubuntu-1804/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://bofeng.github.io/post/ubuntu-1804-rclocal/">Ubuntu 18.04 rc.local</a>
-    </h2>
-    <p class="article-meta">
-      2019-01-30
-      
-        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge warning">
-          linux
-        </a>
-      
-        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge secondary">
-          ubuntu
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      <p>Ubuntu 18.04 removed the <code>/etc/rc.local</code> file, so if you still want to use it:</p>
-
-    </p>
-    <div class="row">
-      <a href="https://bofeng.github.io/post/ubuntu-1804-rclocal/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://bofeng.github.io/post/start-service-upon-rebooting-ubuntu/">Start service upon rebooting ubuntu</a>
-    </h2>
-    <p class="article-meta">
-      2015-12-12
-      
-        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge secondary">
-          ubuntu
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      <p>因为Linode最近重启的有点频繁，所以当重启完成后，需要auto start一些service。之前一直没去了解过<code>/etc/</code>下面那一坨<code>rc.d</code>是怎么回事，这次查了下，留作记录（操作环境是Ubuntu 14.04 LTS）。</p>
-
-    </p>
-    <div class="row">
-      <a href="https://bofeng.github.io/post/start-service-upon-rebooting-ubuntu/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://bofeng.github.io/post/install-ubuntu-on-acer-c720-chromebook/">Install ubuntu on Acer C720 Chromebook</a>
-    </h2>
-    <p class="article-meta">
-      2014-08-16
-      
-        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge ">
-          ubuntu
-        </a>
-      
-        <a href="https://bofeng.github.io/tag/QibBEdubUA/" class="badge secondary">
-          chromebook
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      <p>The price of Acer C720 chromebook now is just $179 in bestbuy, plus tax it is still less than $200, with 16G SSD and up to 8.5 hrs battery life, the idea is you can buy such a laptop and install ubuntu on it to make it as you dev machine, for example, you can buy one for your kids and it is really good for them to learn how to code.</p>
-
-    </p>
-    <div class="row">
-      <a href="https://bofeng.github.io/post/install-ubuntu-on-acer-c720-chromebook/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-
+            </div>
+          </article>
         </div>
-        <div class="row flex-edges">
-  
-  
-</div>
-
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://bofeng.github.io/post/how-to-add-startpage-as-default-search-engine-in-firefox/">
+                <h3 class="post-title">
+                  How to add &#34;startpage&#34; as default search engine in Firefox?
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
       </div>
+
       <div class="sm-12 md-4 col sidebar">
   <div class="paper info-container">
     <img src="https://bofeng.github.io/images/avatar.png?v=1587340321604" class="no-responsive avatar">
@@ -474,27 +337,27 @@
           shell
         </a>
       
-        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge ">
           linux
         </a>
       
-        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge success">
+        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge ">
           ubuntu
         </a>
       
-        <a href="https://bofeng.github.io/tag/49HWll9Mi/" class="badge ">
+        <a href="https://bofeng.github.io/tag/49HWll9Mi/" class="badge secondary">
           firefox
         </a>
       
-        <a href="https://bofeng.github.io/tag/GVVsxSvsE-/" class="badge ">
+        <a href="https://bofeng.github.io/tag/GVVsxSvsE-/" class="badge success">
           privacy
         </a>
       
-        <a href="https://bofeng.github.io/tag/2SkWf0yxm/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/2SkWf0yxm/" class="badge warning">
           gcc
         </a>
       
-        <a href="https://bofeng.github.io/tag/Xp4pUvOV9/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/Xp4pUvOV9/" class="badge ">
           c
         </a>
       
@@ -506,39 +369,39 @@
           websocket
         </a>
       
-        <a href="https://bofeng.github.io/tag/4mqNg88O5/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/4mqNg88O5/" class="badge success">
           nginx
         </a>
       
-        <a href="https://bofeng.github.io/tag/ldB2Nthcy/" class="badge ">
+        <a href="https://bofeng.github.io/tag/ldB2Nthcy/" class="badge secondary">
           apache
         </a>
       
-        <a href="https://bofeng.github.io/tag/jmsnxeb0L/" class="badge ">
+        <a href="https://bofeng.github.io/tag/jmsnxeb0L/" class="badge secondary">
           webpy
         </a>
       
-        <a href="https://bofeng.github.io/tag/dTSYjKA1x/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/dTSYjKA1x/" class="badge secondary">
           passwd
         </a>
       
-        <a href="https://bofeng.github.io/tag/4NRPVT4nt/" class="badge success">
+        <a href="https://bofeng.github.io/tag/4NRPVT4nt/" class="badge ">
           godaddy
         </a>
       
-        <a href="https://bofeng.github.io/tag/Dr03KtaXl/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/Dr03KtaXl/" class="badge warning">
           raspi
         </a>
       
-        <a href="https://bofeng.github.io/tag/DfdCdjQwH/" class="badge success">
+        <a href="https://bofeng.github.io/tag/DfdCdjQwH/" class="badge secondary">
           vnc
         </a>
       
-        <a href="https://bofeng.github.io/tag/GLhh3mgC0/" class="badge ">
+        <a href="https://bofeng.github.io/tag/GLhh3mgC0/" class="badge success">
           logroute
         </a>
       
-        <a href="https://bofeng.github.io/tag/Y-U7pc_rs/" class="badge ">
+        <a href="https://bofeng.github.io/tag/Y-U7pc_rs/" class="badge secondary">
           uwsgi
         </a>
       
@@ -546,47 +409,47 @@
           ngrok
         </a>
       
-        <a href="https://bofeng.github.io/tag/N7uzveFEQ/" class="badge ">
+        <a href="https://bofeng.github.io/tag/N7uzveFEQ/" class="badge secondary">
           flask
         </a>
       
-        <a href="https://bofeng.github.io/tag/t46GgOmQJ/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/t46GgOmQJ/" class="badge warning">
           classmethod
         </a>
       
-        <a href="https://bofeng.github.io/tag/7tN2CvtD1N/" class="badge success">
+        <a href="https://bofeng.github.io/tag/7tN2CvtD1N/" class="badge ">
           staticmethod
         </a>
       
-        <a href="https://bofeng.github.io/tag/eSZ5lHy7P/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/eSZ5lHy7P/" class="badge success">
           python
         </a>
       
-        <a href="https://bofeng.github.io/tag/8bPDgHSAN/" class="badge success">
+        <a href="https://bofeng.github.io/tag/8bPDgHSAN/" class="badge ">
           web
         </a>
       
-        <a href="https://bofeng.github.io/tag/vJnENzWsf/" class="badge ">
+        <a href="https://bofeng.github.io/tag/vJnENzWsf/" class="badge warning">
           ssl
         </a>
       
-        <a href="https://bofeng.github.io/tag/dnoL5D0w-/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/dnoL5D0w-/" class="badge secondary">
           mail
         </a>
       
-        <a href="https://bofeng.github.io/tag/yuo6OYefk4/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/yuo6OYefk4/" class="badge success">
           smtp
         </a>
       
-        <a href="https://bofeng.github.io/tag/GS8sncYwZ/" class="badge success">
+        <a href="https://bofeng.github.io/tag/GS8sncYwZ/" class="badge ">
           rsync
         </a>
       
-        <a href="https://bofeng.github.io/tag/EXump4cPm/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/EXump4cPm/" class="badge ">
           pypi
         </a>
       
-        <a href="https://bofeng.github.io/tag/LzDugb5gQm/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/LzDugb5gQm/" class="badge secondary">
           cors
         </a>
       
@@ -594,15 +457,15 @@
           vim
         </a>
       
-        <a href="https://bofeng.github.io/tag/vLxhso05B/" class="badge ">
+        <a href="https://bofeng.github.io/tag/vLxhso05B/" class="badge warning">
           strace
         </a>
       
-        <a href="https://bofeng.github.io/tag/IbPl9to7C/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/IbPl9to7C/" class="badge warning">
           google
         </a>
       
-        <a href="https://bofeng.github.io/tag/X_VKuDyUs/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/X_VKuDyUs/" class="badge ">
           opensource
         </a>
       
@@ -614,7 +477,7 @@
           mkdocs
         </a>
       
-        <a href="https://bofeng.github.io/tag/K5ngz4Z3X/" class="badge success">
+        <a href="https://bofeng.github.io/tag/K5ngz4Z3X/" class="badge secondary">
           cloudflare
         </a>
       
@@ -626,7 +489,7 @@
           ssh
         </a>
       
-        <a href="https://bofeng.github.io/tag/AWO0Br2y4/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/AWO0Br2y4/" class="badge ">
           scratch
         </a>
       
@@ -638,19 +501,19 @@
           jQuery
         </a>
       
-        <a href="https://bofeng.github.io/tag/3NETfISBbQ/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/3NETfISBbQ/" class="badge warning">
           js
         </a>
       
-        <a href="https://bofeng.github.io/tag/4zLHN4PXY/" class="badge success">
+        <a href="https://bofeng.github.io/tag/4zLHN4PXY/" class="badge secondary">
           docker
         </a>
       
-        <a href="https://bofeng.github.io/tag/ROXx9algt/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/ROXx9algt/" class="badge ">
           opencourse
         </a>
       
-        <a href="https://bofeng.github.io/tag/1KJQkim0xD/" class="badge success">
+        <a href="https://bofeng.github.io/tag/1KJQkim0xD/" class="badge warning">
           course
         </a>
       
@@ -658,15 +521,15 @@
           education
         </a>
       
-        <a href="https://bofeng.github.io/tag/QibBEdubUA/" class="badge ">
+        <a href="https://bofeng.github.io/tag/QibBEdubUA/" class="badge secondary">
           chromebook
         </a>
       
-        <a href="https://bofeng.github.io/tag/rMdHe7zYUx/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/rMdHe7zYUx/" class="badge warning">
           iOS
         </a>
       
-        <a href="https://bofeng.github.io/tag/w0rUetnyT/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/w0rUetnyT/" class="badge ">
           life
         </a>
       
@@ -674,23 +537,23 @@
           hls
         </a>
       
-        <a href="https://bofeng.github.io/tag/ITnA4khP_/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/ITnA4khP_/" class="badge ">
           protobuf
         </a>
       
-        <a href="https://bofeng.github.io/tag/5XAvbVu7Y/" class="badge ">
+        <a href="https://bofeng.github.io/tag/5XAvbVu7Y/" class="badge secondary">
           loadbalance
         </a>
       
-        <a href="https://bofeng.github.io/tag/G6EOG9dUqx/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/G6EOG9dUqx/" class="badge secondary">
           server
         </a>
       
-        <a href="https://bofeng.github.io/tag/v-BqS_DjJ/" class="badge secondary">
+        <a href="https://bofeng.github.io/tag/v-BqS_DjJ/" class="badge success">
           iPhone
         </a>
       
-        <a href="https://bofeng.github.io/tag/I7SG4keW3/" class="badge warning">
+        <a href="https://bofeng.github.io/tag/I7SG4keW3/" class="badge success">
           objc
         </a>
       
@@ -698,7 +561,7 @@
           memcached
         </a>
       
-        <a href="https://bofeng.github.io/tag/eAw-5Salr/" class="badge success">
+        <a href="https://bofeng.github.io/tag/eAw-5Salr/" class="badge secondary">
           datamining
         </a>
       
@@ -708,6 +571,7 @@
     
   </div>
 </div>
+
 
     </div>
 

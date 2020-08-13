@@ -2,13 +2,192 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://bofeng.github.io</id>
     <title>0xBF</title>
-    <updated>2020-04-19T23:52:05.499Z</updated>
+    <updated>2020-08-13T03:55:41.710Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://bofeng.github.io"/>
     <link rel="self" href="https://bofeng.github.io/atom.xml"/>
     <logo>https://bofeng.github.io/images/avatar.png</logo>
     <icon>https://bofeng.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, 0xBF</rights>
+    <entry>
+        <title type="html"><![CDATA[MacOS的Battery显示充电状态不对的问题]]></title>
+        <id>https://bofeng.github.io/post/macos-de-battery-xian-shi-chong-dian-zhuang-tai-bu-dui-de-wen-ti/</id>
+        <link href="https://bofeng.github.io/post/macos-de-battery-xian-shi-chong-dian-zhuang-tai-bu-dui-de-wen-ti/">
+        </link>
+        <updated>2020-08-12T15:51:27.000Z</updated>
+        <content type="html"><![CDATA[<p>已经第二次遇到这个问题了，MBP显示只剩1%的电了，就算插着充电器，也充不进电，而且电量一直在下降。就算重启也没用。<br>
+重置了电池的SMC之后就好了，方法：<br>
+1，关机<br>
+2，按住Ctrl + Shift + Option + Power Button 五秒<br>
+3，按Power Button开机<br>
+然后再充电，电池状态就显示正常了。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Setup wireguard VPN]]></title>
+        <id>https://bofeng.github.io/post/setup-wireguard-vpn/</id>
+        <link href="https://bofeng.github.io/post/setup-wireguard-vpn/">
+        </link>
+        <updated>2020-05-26T09:18:24.000Z</updated>
+        <content type="html"><![CDATA[<p>It is really easy to configure wireguard VPN, compare to the old IPsec and OpenVPN methods.</p>
+<p>In wireguard method, there is no server/client, they are all peers. So a &quot;server&quot; is  a peer, a client is also a peer. If we want to let multi clients to connect to a server, they are actually multi peers connecting to one peer (server).</p>
+<h2 id="1-server-configuration">1, Server configuration</h2>
+<p>On ubuntu &lt; 19.10, you need to do <code>sudo add-apt-repository ppa:wireguard/wireguard</code> first. Version &gt;= 19.10, you can just run: <code>sudo apt install wireguard</code></p>
+<p>Once done, generate private-key and public-key pair for your server:</p>
+<pre><code class="language-bash">$ wg genkey
+# this will generate a private key, e.g. sL9JUT8axlP4wr6udFCraTLxIVNnYLKHNKtxt/JC42w=
+# now use this private key to generate a public key
+$ echo &quot;sL9JUT8axlP4wr6udFCraTLxIVNnYLKHNKtxt/JC42w=&quot; | wg pubkey
+# this will generate a public key, e.g. +cITDHN+T/AseY9eA4SuZQilDUALxC0lCwtHNC6L8yU=
+</code></pre>
+<p>Now go to <code>/etc/wireguard/</code> folder, add a config file: <code>wg0.conf</code>:</p>
+<pre><code>[Interface]
+Address = 10.0.0.1/24
+DNS = 1.1.1.1
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE; ip6tables -A FORWARD -i wg0 -j ACCEPT; ip6tables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE; ip6tables -D FORWARD -i wg0 -j ACCEPT; ip6tables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+ListenPort = 51820
+PrivateKey = sL9JUT8axlP4wr6udFCraTLxIVNnYLKHNKtxt/JC42w=
+</code></pre>
+<p>In the <code>PostUp</code> and <code>PostDown</code> step, replace <code>eth0</code> if your network is running on a different interface.</p>
+<p>Here we are using 51820 as the port. If you are using <code>ufw</code>, remember to unblock this port (wireguard is running on UDP protocol)</p>
+<pre><code class="language-bash">$ ufw allow 51820/udp
+$ ufw status
+</code></pre>
+<h2 id="2-client-setup">2, Client setup</h2>
+<p>Client is another peer. Install client here: <a href="https://www.wireguard.com/install/">https://www.wireguard.com/install/</a></p>
+<p>Wireguard uses public key to identify a peer, so the first setup is still generate private/public key pair:</p>
+<ul>
+<li>MacOS user: open the Wireguard app, click &quot;Add Tunnel&quot; &gt; &quot;Empty Tunnel&quot;, a window will pop-up to show generated private/public key, save those keys somewhere, then click &quot;Discard&quot; (Don't click save)</li>
+<li>Windows user: open the Wireguard app, click &quot;Add Tunnel&quot; &gt; &quot;Empty Tunnel&quot;, a window will pop-up to show generated private/public key, save those keys somewhere, then click &quot;Cancel&quot; (Don't click save)</li>
+<li>Ubuntu user: use the same way which used by server in above step. i.e. the &quot;wg genkey&quot; etc. method.</li>
+</ul>
+<p>Once you have the private key and public key, create a config file anywhere (If you are using Ubuntu, put that config in <code>/etc/wireguard/wgclient.conf</code>), the content is like this:</p>
+<pre><code>[Interface]
+DNS = 1.1.1.1
+PrivateKey = &lt;your client private key&gt;
+Address = 10.0.0.2/32
+# if you have multi client across different devices, use different address here like:
+# 10.0.0.3/32, 10.0.0.4/32, etc
+[Peer]
+PublicKey = &lt;server's public key which is generated in the first step&gt; 
+Endpoint = &lt;server's ip&gt;:51820
+AllowedIPs = 0.0.0.0/0, ::/0
+</code></pre>
+<p>Save this <code>wgclient.conf</code> file, for MacOS and Windows user, click &quot;Add Tunnel&quot; &gt; &quot;Add Tunnel from existing config file&quot;, then select this config file. After this, configuration on the client side are all set.</p>
+<h2 id="3-add-client-to-server">3, Add client to server</h2>
+<p>Now we have client's private key and public key, it is time to add the client public key to server. Back to our <code>/etc/wireguard/wg0.conf</code> file in server side, then add:</p>
+<pre><code>[Peer]
+# client 1
+PublicKey = &lt;client1's public key&gt;
+AllowedIPs = 10.0.0.2/32
+
+[Peer]
+# client 2
+PublicKey = &lt;client2's public key&gt;
+AllowedIPs = 10.0.0.3/32
+</code></pre>
+<p>Now activate the wireguard in server side:</p>
+<pre><code class="language-bash"># activate
+$ wg-quick up wg0
+# to deactivate it, run:
+# $ wg-quick down wg0
+</code></pre>
+<h2 id="4-connect-client-to-server">4, Connect client to server</h2>
+<p>For MacOS and Windows user, since we have added the configuration file in step 2, all you need to do is click the &quot;activate&quot; button. For Ubuntu user, just run <code>wg-quick up wgclient</code>. Once done, your client peer should be now connected to the server peer.</p>
+<p>On server side you can run <code>wg show</code> to check the connected peers status.</p>
+<p>To disconnect it, MacOS and Windows user can just click the &quot;deactivate&quot; button. Ubuntu user can run <code>wg-quick down wgclient</code>.</p>
+<h2 id="others">Others</h2>
+<p>1, To make wireguard auto run on system boot, run:</p>
+<pre><code class="language-bash">sudo systemctl enable wg-quick@wg0
+</code></pre>
+<p>2, If you have some website running in your VPN server and you want to access it with wireguard VPN connected, the access IP now will be the private IP (e.g. 10.0.0.2, 10.0.0.3). If you website have an IP whitelist, you need to list those IPs as well. For example, in Nginx, you can add:</p>
+<pre><code>allow 10.0.0.1;
+allow 10.0.0.2;
+</code></pre>
+<p>You can also add a range, e.g. if you want to allow 10.0.0.1 to 10.0.0.19, a &quot;IP to CIDR&quot; address tool can help: <a href="https://www.ipaddressguide.com/cidr#range">https://www.ipaddressguide.com/cidr#range</a>. For example, for IP range 10.0.0.1 to 10.0.0.19, you can add <code>allow</code> like this:</p>
+<pre><code>allow 10.0.0.1/32;
+allow 10.0.0.2/31;
+allow 10.0.0.4/30;
+allow 10.0.0.8/29;
+allow 10.0.0.16/30;
+</code></pre>
+<h2 id="reference">Reference</h2>
+<ol>
+<li><a href="https://www.linode.com/docs/networking/vpn/set-up-wireguard-vpn-on-ubuntu/">https://www.linode.com/docs/networking/vpn/set-up-wireguard-vpn-on-ubuntu/</a></li>
+<li><a href="https://tau.gr/posts/2019-03-02-set-up-wireguard-vpn-ubuntu-mac/">https://tau.gr/posts/2019-03-02-set-up-wireguard-vpn-ubuntu-mac/</a></li>
+<li><a href="https://gist.github.com/chrisswanda/88ade75fc463dcf964c6411d1e9b20f4">https://gist.github.com/chrisswanda/88ade75fc463dcf964c6411d1e9b20f4</a></li>
+</ol>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[rocket.chat server stopped on an update]]></title>
+        <id>https://bofeng.github.io/post/rocketchat-server-stopped-on-an-update/</id>
+        <link href="https://bofeng.github.io/post/rocketchat-server-stopped-on-an-update/">
+        </link>
+        <updated>2020-05-12T10:33:01.000Z</updated>
+        <content type="html"><![CDATA[<p>Today our self-hosted rocket.chat server suddenly stopped running, and it turns out I am not the only one <a href="https://forums.rocket.chat/t/sudden-502-error/6914">experiencing this problem</a></p>
+<p>When I check the server, use the command to check status of rocketchat server and its mongo:</p>
+<pre><code class="language-bash">$ service snap.rocketchat-server.rocketchat-server status
+# this shows mongodb cannot be connected
+$ service snap.rocketchat-server.rocketchat-mongo status
+# this shows mongdb is not running
+</code></pre>
+<p>So apparently there is something wrong with MongoDB. When I check the mongo start log with command:</p>
+<pre><code class="language-bash">journalctl -u snap.rocketchat-server.rocketchat-mongo
+</code></pre>
+<p>There are some errors about the versioning:</p>
+<blockquote>
+<p>[initandlisten] WiredTiger error (-31802) [1589310297:583337][24694:0x7fbd44f65d00], txn-recover: unsupported WiredTiger file version: this build  only supports major/minor versions up to 1/0,  and the file is version 2/0: WT_ERROR: non-specific WiredTiger error</p>
+</blockquote>
+<p>It turns out snap did an update to our rocket.chat server, and updated it to the new version, which now runnign mongodb version 3.6 and changed some database files. Now the database files cannot be run under mongo3.4 anymore (which rocket.server needs).</p>
+<p>So I followed this method <a href="https://forums.rocket.chat/t/suddenly-mongod-is-not-starting/4983/2">here</a>:</p>
+<ol>
+<li>Download version 3.6 in mongodb's website</li>
+<li>cd to version 3.6 bin: <code>./mongod --dbpath /var/snap/rocketchat-server/common/</code></li>
+<li>in the same 3.6 bin folder, use mongo connect to the server: <code>./mongo</code></li>
+<li>now is the key part, run commnad: <code>db.adminCommand( { setFeatureCompatibilityVersion: “3.4” } )</code></li>
+<li>exit both above mongo and mongod</li>
+<li>cd to <code>/snap/rocketchat-server/current/bin</code></li>
+<li>run <code>./mongod --repair --dbpath /var/snap/rocketchat-server/common/</code></li>
+<li>once it is done, try start rocketchat-mongo: <code>service snap.rocketchat-server.rocketchat-mongo start</code>, then check its status again: <code>service snap.rocketchat-server.rocketchat-mongo status</code>, it should be running now.</li>
+</ol>
+<p>The MongoDB is running, but when I use:</p>
+<pre><code class="language-bash">service snap.rocketchat-server.rocketchat-server start
+</code></pre>
+<p>to start the rocket.chat server, it still doesn't work. By checking its log:</p>
+<pre><code class="language-bash">journalctl -u snap.rocketchat-server.rocketchat-server
+</code></pre>
+<p>Found there is a line:</p>
+<blockquote>
+<p>fs.js:646<br>
+return binding.open(pathModule._makeLong(path), stringToFlags(flags), mode);<br>
+^<br>
+Error: ENOENT: no such file or directory, open '/snap/rocketchat-server/1436/star.json'</p>
+</blockquote>
+<p>When I cd to <code>/snap/rocketchat-server/1436/</code> folder, there is no &quot;star.json&quot; file. But the old version 1427 has it: <code>/snap/rocketchat-server/1427/</code></p>
+<p>So I guess there is an error in this new version, have to roll it back to previous version and forbid it to update the latest version:</p>
+<pre><code class="language-bash">$ snap revert --revision=1427 rocketchat-server
+$ snap run --shell rocketchat-server
+$ snapctl get snap-refreshing #which returned &quot;true&quot;
+$ snapctl set snap-refreshing=false
+</code></pre>
+<p>Now start the server again:</p>
+<pre><code class="language-bash">$ service snap.rocketchat-server.rocketchat-server start
+</code></pre>
+<p>check the status:</p>
+<pre><code class="language-bash">$ service snap.rocketchat-server.rocketchat-server status
+</code></pre>
+<p>Now it works!!! after spending several hours on this ... what a fun day 😄</p>
+<h3 id="reference">Reference:</h3>
+<ul>
+<li><a href="https://rocket.chat/docs/installation/manual-installation/ubuntu/snaps/">https://rocket.chat/docs/installation/manual-installation/ubuntu/snaps/</a></li>
+<li><a href="https://forums.rocket.chat/t/snap-2-1-update-issues/5019">https://forums.rocket.chat/t/snap-2-1-update-issues/5019</a></li>
+<li><a href="https://forums.rocket.chat/t/suddenly-mongod-is-not-starting/4983/2">https://forums.rocket.chat/t/suddenly-mongod-is-not-starting/4983/2</a></li>
+<li><a href="https://forums.rocket.chat/t/sudden-502-error/6914/10">https://forums.rocket.chat/t/sudden-502-error/6914/10</a></li>
+</ul>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Copy file content to clipboard in terminal]]></title>
         <id>https://bofeng.github.io/post/copy-file-content-to-clipboard-in-terminal/</id>
@@ -429,384 +608,6 @@ Year: 2020, Month: 4, Day: 3
 <blockquote>
 <p>maxPoolSize (optional): The maximum allowable number of concurrent connections to each connected server. Requests to a server will block if there are maxPoolSize outstanding connections to the requested server. Defaults to 100. Cannot be 0.</p>
 </blockquote>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[🌟 Starlette Quick Manual]]></title>
-        <id>https://bofeng.github.io/post/starlette-quick-manual/</id>
-        <link href="https://bofeng.github.io/post/starlette-quick-manual/">
-        </link>
-        <updated>2020-02-09T23:39:23.000Z</updated>
-        <content type="html"><![CDATA[<p><a href="https://www.starlette.io/">Starlette</a> is an ASGI web framework for Python.</p>
-<h2 id="1-get-value-from-query-string">1, Get value from Query String</h2>
-<p>This is commonly used when trying to get param value from GET request.</p>
-<pre><code class="language-python">async def handler(request):
-    name = request.query_params.get(&quot;name&quot;)
-</code></pre>
-<h2 id="2-get-value-from-path">2, Get value from Path</h2>
-<pre><code class="language-python"># In url if you config:
-Route(&quot;/post/{postid}&quot;, endpoint=post)
-
-# In handler function:
-async def post(request):
-    postid = request.path_params.get(&quot;postid&quot;)
-</code></pre>
-<h2 id="3-get-value-from-body">3, Get value from Body</h2>
-<p>This is commonly used when trying to get param value from a POST request.</p>
-<pre><code class="language-python">async def handler(request):
-    inp = await request.form()
-    name = inp.get(&quot;name&quot;)
-</code></pre>
-<h2 id="4-get-uploaded-file-content">4, Get uploaded file content</h2>
-<pre><code class="language-python">async def handler(request):
-    inp = await request.form()
-    uploaded_file = inp[&quot;filename&quot;]
-    filename = uploaded_file.filename           # abc.png
-    content_type = uploaded.content_type    # MIME type, e.g. image/png
-    content = await uploaded_file.read()       # image content
-</code></pre>
-<h2 id="5-return-a-rendered-page-response">5, Return a rendered page response</h2>
-<pre><code class="language-python">from starlette.templating import Jinja2Templates
-TMPL_ENGINE = Jinja2Templates(directory=&quot;templates&quot;)
-
-async def handler(request):
-    data = {
-        &quot;request&quot;: request,
-        # ... other data
-    }
-    return TMPL_ENGINE.TemplateResponse(&quot;home.html&quot;, data)
-</code></pre>
-<h2 id="6-return-a-json-response">6, Return a JSON response</h2>
-<pre><code class="language-python">from starlette.responses import JSONResponse
-
-async def handler(request):
-    return JSONResponse({&quot;name&quot;: &quot;Bo&quot;})
-</code></pre>
-<h2 id="7-return-a-customized-response-status-code-and-headers">7, Return a customized response (status code and headers)</h2>
-<p>The above <code>TemplateResponse</code> and <code>JSONResponse</code> are subclass of the <code>Response</code> class. We can return a customized <code>Response</code>:</p>
-<pre><code class="language-python">import json
-from starlette.responses import Response
-
-async def handler(request):
-    data = {
-        &quot;name&quot;: &quot;Bo&quot;
-    }
-    return Response(json.dumps(data), media_type=&quot;application/json&quot;)
-</code></pre>
-<p><code>Response</code> takes <code>status_code</code>, <code>headers</code> and <code>media_type</code>, so if we want to change a response's status code, we can do:</p>
-<pre><code class="language-python">return Response(content, statu_code=404)
-</code></pre>
-<p>And customized headers:</p>
-<pre><code class="language-python">headers = {
-	&quot;x-extra-key&quot;: &quot;value&quot;
-}
-return Response(content, status_code=200, headers=headers)
-</code></pre>
-<p>Since <code>TemplateResponse</code> and <code>JSONResponse</code> are subclass of <code>Response</code>, these 3 parameters can be applied to them.</p>
-<pre><code class="language-python">return TMPL_ENGINE.TemplateResponse(&quot;home.html&quot;, data, headers=headers)
-# And
-return JSONResponse({&quot;name&quot;: &quot;Bo&quot;}, status_code=200, headers=headers)
-</code></pre>
-<h2 id="8-redirect">8, Redirect</h2>
-<pre><code class="language-python">from starlette.responses import RedirectResponse
-
-async handler(request):
-    # Customize status_code: 
-    #   301: permanent redirect 
-    #   302: temporary redirect 
-    #   303: see others
-    #   307: temporary redirect (default)
-    return RedirectResponse(url=url, status_code=303)
-</code></pre>
-<h2 id="9-get-set-cookies">9, Get &amp; Set Cookies</h2>
-<pre><code class="language-python"># get cookie
-async def handler(request):
-    request.cookies.get('mycookie')
-
-# set cookie
-async def handler(request):
-    resp = Response(content)
-    # set_cookie(key, value, max_age=None, expires=None, path=&quot;/&quot;, domain=None, secure=False, httponly=False)
-    resp.set_cookie(&quot;mycookie&quot;, &quot;value&quot;)
-    # delete cookie: delete_cookie(key, path='/', domain=None)
-    resp.delete_cookie(&quot;myoldcookie&quot;)
-    return resp
-</code></pre>
-<h2 id="10-use-session">10, Use session</h2>
-<p>Starlette provides a cookie-based session middleware:</p>
-<pre><code class="language-python">from starlette.middleware import Middleware
-from starlette.middleware.sessions import SessionMiddleware
-
-middlewares = [
-    Middleware(SessionMiddleware,
-                secret_key=config.SESSION_CONFIG[&quot;secret_key&quot;],
-                max_age=config.SESSION_CONFIG[&quot;max_age&quot;]),
-]
-
-app = Starlette(routes=routes, middleware=middlewares)
-
-# Then in handler you can use it
-async def handler(request):
-    request.session[&quot;login_user&quot;] = &quot;bo&quot;
-</code></pre>
-<p>Since this middleware used <code>json</code> to serialize and deserialize data, the data you saved in session need to be <code>json</code> serializiable. For example, if you save a <code>ObjectId</code> object (from MongoDB) in session, it won't know how to use json to serialize it, thus will raise exception and cannot save to cookie.</p>
-<h2 id="11-request-context">11, Request context</h2>
-<h3 id="1-url-object-requesturl">1) URL Object: <code>request.url</code></h3>
-<ul>
-<li>Get request full url: <code>url = str(request.url)</code></li>
-<li>Get scheme: <code>request.url.scheme</code> (http, https, ws, wss)</li>
-<li>Get netloc: <code>request.url.netloc</code>, e.g.: example.com:8080</li>
-<li>Get path: <code>request.url.path</code>, e.g.: /search</li>
-<li>Get query string: <code>request.url.query</code>, e.g.: kw=hello</li>
-<li>Get hostname: <code>request.url.hostname</code>, e.g.: example.com</li>
-<li>Get port: <code>request.url.port</code>, e.g.: 8080</li>
-<li>If using secure scheme: <code>request.url.is_secure</code>, True is schme is <code>https</code> or <code>wss</code></li>
-</ul>
-<h3 id="2-headers-requestheaders">2) Headers: <code>request.headers</code></h3>
-<pre><code class="language-python">{
-    'host': 'example.com:8080', 
-    'connection': 'keep-alive', 
-    'cache-control': 'max-age=0', 
-    'sec-ch-ua': 'Google Chrome 80', 
-    'dnt': '1', 
-    'upgrade-insecure-requests': '1', 
-    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) ...',
-    'sec-fetch-dest': 'document', 
-    'accept': 'text/html,image/apng,*/*;q=0.8;v=b3;q=0.9', 
-    'sec-origin-policy': '0', 
-    'sec-fetch-site': 'none', 
-    'sec-fetch-mode': 'navigate', 
-    'sec-fetch-user': '?1', 
-    'accept-encoding': 'gzip, deflate, br', 
-    'accept-language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7,zh-TW;q=0.6', 
-    'cookie': 'session=eyJhZG1pbl91c2_KiQ...'
-}
-</code></pre>
-<h3 id="3-client-requestclient">3) Client: <code>request.client</code></h3>
-<ul>
-<li><code>request.client.host</code>: get client sock IP</li>
-<li><code>request.client.port</code>: get client sock port</li>
-</ul>
-<h3 id="4-method-requestmethod">4) Method: <code>request.method</code></h3>
-<ul>
-<li><code>request.method</code>: GET, POST, etc.</li>
-</ul>
-<h3 id="5-get-data">5) Get Data</h3>
-<ul>
-<li><code>await request.body()</code>: get raw data from body</li>
-<li><code>await request.json()</code>: get passed data and parse it as JSON</li>
-<li><code>await request.form()</code>: get posted data and pass it as dictionary</li>
-</ul>
-<h3 id="6-scope-requestscope">6) Scope: <code>request.scope</code></h3>
-<pre><code class="language-python">{
-    'type': 'http', 
-    'http_version': '1.1', 
-    'server': ('127.0.0.1', 9092), 
-    'client': ('127.0.0.1', 53102), 
-    'scheme': 'https', 
-    'method': 'GET', 
-    'root_path': '', 
-    'path': '/', 
-    'raw_path': b'/', 
-    'query_string': b'kw=hello', 
-    'headers': [
-        (b'host', b'example.com:8080'), 
-        (b'connection', b'keep-alive'), 
-        (b'cache-control', b'max-age=0'), 
-        ...
-    ], 
-    'app': &lt;starlette.applications.Starlette object at 0x1081bd650&gt;, 
-    'session': {'uid': '57ba03ea7333f72a25f837cf'}, 
-    'router': &lt;starlette.routing.Router object at 0x1081bd6d0&gt;, 
-    'endpoint': &lt;class 'app.index.Index'&gt;, 
-    'path_params': {}
-}
-</code></pre>
-<h2 id="12-put-varaible-in-request-app-scope">12, Put varaible in request &amp; app scope</h2>
-<pre><code class="language-python">app.state.dbconn = get_db_conn()
-request.state.start_time = time.time()
-# use app-scope state variable in a request
-request.app.state.dbconn
-</code></pre>
-<h2 id="13-utility-functions">13, Utility functions</h2>
-<h3 id="1-use-state-to-wrap-a-dictionary">1) Use <code>State</code> to wrap a dictionary</h3>
-<pre><code class="language-python">from starlette.datastructures import State
-
-data = {
-    &quot;name&quot;: &quot;Bo&quot;
-}
-print(data[&quot;name&quot;])
-# now wrap it with State function
-wrapped = State(data)
-# You can use the dot syntaxt, but can't use `wrapped[&quot;name&quot;]` any more.
-print(wrapped.name)
-</code></pre>
-<h3 id="2-check-if-request-is-a-ajax-request">2) check if request is a ajax request</h3>
-<p>Depend on what client library you are using, the header's key and value might be different. Here is an example when use <code>$.ajax</code> function from jQuery.</p>
-<pre><code class="language-python">return request.headers.get(&quot;x-requested-with&quot;) == &quot;XMLHttpRequest&quot;
-</code></pre>
-<h3 id="3-login_required-wrapper-function">3) login_required wrapper function</h3>
-<pre><code class="language-python">import functools
-from starlette.endpoints import HTTPEndpoint
-from starlette.responses import Response
-
-def login_required(login_url=&quot;/signin&quot;):
-    def decorator(handler):
-        @functools.wraps(handler)
-        async def new_handler(obj, req, *args, **kwargs):
-            user = req.session.get(&quot;login_user&quot;)
-            if user is None:
-                return seeother(login_url)
-            return await handler(obj, req, *args, **kwargs)
-        return new_handler
-    return decorator
-
-class MyAccount(HTTPEndpiont):
-    @login_required()
-    async def get(self, request):
-        # some logic here
-        content = &quot;hello&quot;
-        return Response(content)
-</code></pre>
-<h2 id="14-exceptions">14, Exceptions</h2>
-<p>Handle exception and customize 403, 404, 503, 500 page:</p>
-<pre><code class="language-python">from starlette.exceptions import HTTPException
-
-async def exc_handle_403(request, exc):
-    return HTMLResponse(&quot;My 403 page&quot;, status_code=exc.status_code)
-
-async def exc_handle_404(request, exc):
-    return HTMLResponse(&quot;My 404 page&quot;, status_code=exc.status_code)
-
-async def exc_handle_503(request, exc):
-    return HTMLResponse(&quot;Failed, please try it later&quot;, status_code=exc.status_code)
-
-# error is not exception, 500 is server side unexpected error, all other status code will be treated as Exception
-async def err_handle_500(request, exc):
-    import traceback
-    Log.error(traceback.format_exc())
-    return HTMLResponse(&quot;My 500 page&quot;, status_code=500)
-
-# To add handler, we can add either status_code or Exception itself as key
-exception_handlers = {
-    403: exc_handle_403,
-    404: exc_handle_404,
-    503: exc_handle_503,
-    500: err_handle_500,
-    #HTTPException: exc_handle_500,
-}
-
-app = Starlette(routes=routes, exception_handlers=exception_handlers)
-</code></pre>
-<h2 id="15-background-task">15, Background Task</h2>
-<h3 id="1-put-some-async-task-as-background-task">1) Put some async task as background task</h3>
-<pre><code class="language-python">import aiofiles
-from starlette.background import BackgroundTask
-from starlette.responses import Response
-
-aiofiles_remove = aiofiles.os.wrap(os.remove)
-
-async def del_file(fpath):
-    await aiofiles_remove(fpath)
-
-async def handler(request):
-    content = &quot;&quot;
-    fpath = &quot;/tmp/tmpfile.txt&quot;
-    task = BackgroundTask(del_file, fpath=fpath)
-    return Response(content, background=task)
-</code></pre>
-<h3 id="2-put-multiple-tasks-as-background-task">2) Put multiple tasks as background task</h3>
-<pre><code class="language-python">from starlette.background import BackgroundTasks
-
-async def task1(name):
-    pass
-
-async def task2(email):
-    pass
-
-async def handler(request):
-    tasks = BackgroundTasks()
-    tasks.add_task(task1, name=&quot;John&quot;)
-    tasks.add_task(task2, email=&quot;info@example.com&quot;)
-    content = &quot;&quot;
-    return Response(content, background=tasks)
-</code></pre>
-<h2 id="16-write-middleware">16, Write middleware</h2>
-<p>There are 2 ways to write middleware:</p>
-<h3 id="1-define-__call__-function">1) Define <code>__call__</code> function:</h3>
-<pre><code class="language-python">class MyMiddleware:
-    def __init__(self, app):
-        self.app = app
-
-    async def __call__(self, scope, receive, send):
-        # see above scope dictionary as reference
-        headers = dict(scope[&quot;headers&quot;])
-        # do something
-        # pass to next middleware
-        return await self.app(scope, receive, send)
-</code></pre>
-<h3 id="2-use-basehttpmiddleware">2) Use <code>BaseHTTPMiddleware</code></h3>
-<pre><code class="language-python">from starlette.middleware.base import BaseHTTPMiddleware
-
-class CustomHeaderMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request, call_next):
-        # do something before pass to next middleware
-        response = await call_next(request)
-        # do something after next middleware returned
-        response.headers['X-Author'] = 'John'
-        return response
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[🚀 Deploy Poll App to Rocket.chat]]></title>
-        <id>https://bofeng.github.io/post/deploy-poll-app-to-rocketchat/</id>
-        <link href="https://bofeng.github.io/post/deploy-poll-app-to-rocketchat/">
-        </link>
-        <updated>2020-01-29T05:31:39.000Z</updated>
-        <content type="html"><![CDATA[<p>You don't have to connect to rocket.chat cloud to install apps from the market place. If you have the app's code, you can deploy the app yourself.</p>
-<p>Here is an example to deploy <code>poll</code> app:</p>
-<p>1, Install the <code>rc-apps</code> tool: <code>npm install -g @rocket.chat/apps-cli</code>. To confirm <code>rc-apps</code> has been successfully installed, run <code>rc-apps -v</code><br>
-2, To install the <code>poll</code> app, go to <a href="https://github.com/sampaiodiego/rocket.chat.app-poll">https://github.com/sampaiodiego/rocket.chat.app-poll</a><br>
-3, Clone the repo: <a href="https://github.com/sampaiodiego/rocket.chat.app-poll.git">https://github.com/sampaiodiego/rocket.chat.app-poll.git</a><br>
-4, cd to the repo, and install dependencies with <code>npm install</code> and <code>npm i @types/node</code><br>
-5, Build the <code>poll</code> package: <code>rc-apps package</code><br>
-6, Deploy: <code>rc-apps deploy</code>. When run this command, it will prompt to ask you input your rocket.chat server url, admin's username and password, like this:</p>
-<pre><code>What is the server's url (include https)?: https://rc.example.com
-What is the username?: admin
-And, what is the password?: *********
-deploying your app... deployed!
-</code></pre>
-<h3 id="reference">Reference</h3>
-<ul>
-<li><a href="https://rocket.chat/docs/developer-guides/developing-apps/getting-started/">https://rocket.chat/docs/developer-guides/developing-apps/getting-started/</a></li>
-<li><a href="https://github.com/sampaiodiego/rocket.chat.app-poll">https://github.com/sampaiodiego/rocket.chat.app-poll</a></li>
-</ul>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[🚁 Proxy Websocket Timeout ]]></title>
-        <id>https://bofeng.github.io/post/proxy-websocket-timeout/</id>
-        <link href="https://bofeng.github.io/post/proxy-websocket-timeout/">
-        </link>
-        <updated>2019-12-11T16:55:43.000Z</updated>
-        <content type="html"><![CDATA[<p>之前在<a href="https://bofeng.github.io/post/proxy-websocket-configuration-in-apache-and-nginx/">这篇文章</a>里提到用Nginx和Apache代理websocket的连接，一个项目在测试机上有人反映如果一分钟没有在ws上输入信息，连接就会断掉。</p>
-<p>打log之后在client端显示是ws.onclose的事件被触发了，触发的event的code是1006，reason是&quot;&quot;，搜了一圈发现是Nginx的配置问题。Nginx在proxy ws的时候，默认的read timeout是60秒，如果在60秒内ws上没有数据传输，Nginx就会把它断掉。</p>
-<p>解决方法是在proxy的配置上添加timeout的设置：</p>
-<pre><code class="language-nginx">location /ws/ {
-        proxy_pass &quot;http://localhost:8765/ws/&quot;;
-        proxy_http_version 1.1;
-        proxy_read_timeout 1800;  # 添加
-        proxy_send_timeout 1800;  # 添加
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection &quot;Upgrade&quot;;
-}
-</code></pre>
-<p>在另外Apache的机器上经测试没有这个1分钟超时的问题，因为<a href="https://httpd.apache.org/docs/trunk/mod/mod_proxy_wstunnel.html#proxywebsocketidletimeout">Apache默认的IdleTimeout是0</a>，也就是永不超时，所以跑Apache代理ws的机器没有这个问题。</p>
-<h3 id="reference">Reference</h3>
-<ul>
-<li><a href="https://github.com/websockets/ws/issues/1598#issuecomment-504794623">https://github.com/websockets/ws/issues/1598#issuecomment-504794623</a></li>
-</ul>
 ]]></content>
     </entry>
 </feed>

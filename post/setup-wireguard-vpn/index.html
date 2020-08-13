@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Setup wireguard VPN | 0xBF</title>
+<meta name="description" content="">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://bofeng.github.io/favicon.ico?v=1597290930595">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://bofeng.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://bofeng.github.io">0xBF</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/open-source-license-flow-chart/" class="menu">
+                Open Source License
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>Setup wireguard VPN</h1>
+            <p class="article-meta">
+              2020-05-26
+              
+                <a href="https://bofeng.github.io/tag/mwBNLmU18/" class="badge secondary">
+                  wireguard
+                </a>
+              
+                <a href="https://bofeng.github.io/tag/P7JfwZd9jo/" class="badge success">
+                  vpn
+                </a>
+              
+                <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge secondary">
+                  linux
+                </a>
+              
+                <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge success">
+                  ubuntu
+                </a>
+              
+            </p>
+            
+              <img src="https://bofeng.github.io/post-images/setup-wireguard-vpn.png" alt="Setup wireguard VPN">
+            
+            <div class="post-content">
+              <p>It is really easy to configure wireguard VPN, compare to the old IPsec and OpenVPN methods.</p>
+<p>In wireguard method, there is no server/client, they are all peers. So a &quot;server&quot; is  a peer, a client is also a peer. If we want to let multi clients to connect to a server, they are actually multi peers connecting to one peer (server).</p>
+<h2 id="1-server-configuration">1, Server configuration</h2>
+<p>On ubuntu &lt; 19.10, you need to do <code>sudo add-apt-repository ppa:wireguard/wireguard</code> first. Version &gt;= 19.10, you can just run: <code>sudo apt install wireguard</code></p>
+<p>Once done, generate private-key and public-key pair for your server:</p>
+<pre><code class="language-bash">$ wg genkey
+# this will generate a private key, e.g. sL9JUT8axlP4wr6udFCraTLxIVNnYLKHNKtxt/JC42w=
+# now use this private key to generate a public key
+$ echo &quot;sL9JUT8axlP4wr6udFCraTLxIVNnYLKHNKtxt/JC42w=&quot; | wg pubkey
+# this will generate a public key, e.g. +cITDHN+T/AseY9eA4SuZQilDUALxC0lCwtHNC6L8yU=
+</code></pre>
+<p>Now go to <code>/etc/wireguard/</code> folder, add a config file: <code>wg0.conf</code>:</p>
+<pre><code>[Interface]
+Address = 10.0.0.1/24
+DNS = 1.1.1.1
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE; ip6tables -A FORWARD -i wg0 -j ACCEPT; ip6tables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE; ip6tables -D FORWARD -i wg0 -j ACCEPT; ip6tables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+ListenPort = 51820
+PrivateKey = sL9JUT8axlP4wr6udFCraTLxIVNnYLKHNKtxt/JC42w=
+</code></pre>
+<p>In the <code>PostUp</code> and <code>PostDown</code> step, replace <code>eth0</code> if your network is running on a different interface.</p>
+<p>Here we are using 51820 as the port. If you are using <code>ufw</code>, remember to unblock this port (wireguard is running on UDP protocol)</p>
+<pre><code class="language-bash">$ ufw allow 51820/udp
+$ ufw status
+</code></pre>
+<h2 id="2-client-setup">2, Client setup</h2>
+<p>Client is another peer. Install client here: <a href="https://www.wireguard.com/install/">https://www.wireguard.com/install/</a></p>
+<p>Wireguard uses public key to identify a peer, so the first setup is still generate private/public key pair:</p>
+<ul>
+<li>MacOS user: open the Wireguard app, click &quot;Add Tunnel&quot; &gt; &quot;Empty Tunnel&quot;, a window will pop-up to show generated private/public key, save those keys somewhere, then click &quot;Discard&quot; (Don't click save)</li>
+<li>Windows user: open the Wireguard app, click &quot;Add Tunnel&quot; &gt; &quot;Empty Tunnel&quot;, a window will pop-up to show generated private/public key, save those keys somewhere, then click &quot;Cancel&quot; (Don't click save)</li>
+<li>Ubuntu user: use the same way which used by server in above step. i.e. the &quot;wg genkey&quot; etc. method.</li>
+</ul>
+<p>Once you have the private key and public key, create a config file anywhere (If you are using Ubuntu, put that config in <code>/etc/wireguard/wgclient.conf</code>), the content is like this:</p>
+<pre><code>[Interface]
+DNS = 1.1.1.1
+PrivateKey = &lt;your client private key&gt;
+Address = 10.0.0.2/32
+# if you have multi client across different devices, use different address here like:
+# 10.0.0.3/32, 10.0.0.4/32, etc
+[Peer]
+PublicKey = &lt;server's public key which is generated in the first step&gt; 
+Endpoint = &lt;server's ip&gt;:51820
+AllowedIPs = 0.0.0.0/0, ::/0
+</code></pre>
+<p>Save this <code>wgclient.conf</code> file, for MacOS and Windows user, click &quot;Add Tunnel&quot; &gt; &quot;Add Tunnel from existing config file&quot;, then select this config file. After this, configuration on the client side are all set.</p>
+<h2 id="3-add-client-to-server">3, Add client to server</h2>
+<p>Now we have client's private key and public key, it is time to add the client public key to server. Back to our <code>/etc/wireguard/wg0.conf</code> file in server side, then add:</p>
+<pre><code>[Peer]
+# client 1
+PublicKey = &lt;client1's public key&gt;
+AllowedIPs = 10.0.0.2/32
+
+[Peer]
+# client 2
+PublicKey = &lt;client2's public key&gt;
+AllowedIPs = 10.0.0.3/32
+</code></pre>
+<p>Now activate the wireguard in server side:</p>
+<pre><code class="language-bash"># activate
+$ wg-quick up wg0
+# to deactivate it, run:
+# $ wg-quick down wg0
+</code></pre>
+<h2 id="4-connect-client-to-server">4, Connect client to server</h2>
+<p>For MacOS and Windows user, since we have added the configuration file in step 2, all you need to do is click the &quot;activate&quot; button. For Ubuntu user, just run <code>wg-quick up wgclient</code>. Once done, your client peer should be now connected to the server peer.</p>
+<p>On server side you can run <code>wg show</code> to check the connected peers status.</p>
+<p>To disconnect it, MacOS and Windows user can just click the &quot;deactivate&quot; button. Ubuntu user can run <code>wg-quick down wgclient</code>.</p>
+<h2 id="others">Others</h2>
+<p>1, To make wireguard auto run on system boot, run:</p>
+<pre><code class="language-bash">sudo systemctl enable wg-quick@wg0
+</code></pre>
+<p>2, If you have some website running in your VPN server and you want to access it with wireguard VPN connected, the access IP now will be the private IP (e.g. 10.0.0.2, 10.0.0.3). If you website have an IP whitelist, you need to list those IPs as well. For example, in Nginx, you can add:</p>
+<pre><code>allow 10.0.0.1;
+allow 10.0.0.2;
+</code></pre>
+<p>You can also add a range, e.g. if you want to allow 10.0.0.1 to 10.0.0.19, a &quot;IP to CIDR&quot; address tool can help: <a href="https://www.ipaddressguide.com/cidr#range">https://www.ipaddressguide.com/cidr#range</a>. For example, for IP range 10.0.0.1 to 10.0.0.19, you can add <code>allow</code> like this:</p>
+<pre><code>allow 10.0.0.1/32;
+allow 10.0.0.2/31;
+allow 10.0.0.4/30;
+allow 10.0.0.8/29;
+allow 10.0.0.16/30;
+</code></pre>
+<h2 id="reference">Reference</h2>
+<ol>
+<li><a href="https://www.linode.com/docs/networking/vpn/set-up-wireguard-vpn-on-ubuntu/">https://www.linode.com/docs/networking/vpn/set-up-wireguard-vpn-on-ubuntu/</a></li>
+<li><a href="https://tau.gr/posts/2019-03-02-set-up-wireguard-vpn-ubuntu-mac/">https://tau.gr/posts/2019-03-02-set-up-wireguard-vpn-ubuntu-mac/</a></li>
+<li><a href="https://gist.github.com/chrisswanda/88ade75fc463dcf964c6411d1e9b20f4">https://gist.github.com/chrisswanda/88ade75fc463dcf964c6411d1e9b20f4</a></li>
+</ol>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://bofeng.github.io/post/rocketchat-server-stopped-on-an-update/">
+                <h3 class="post-title">
+                  rocket.chat server stopped on an update
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://bofeng.github.io/images/avatar.png?v=1597290930595" class="no-responsive avatar">
+    <div class="text-muted"></div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/macos-de-battery-xian-shi-chong-dian-zhuang-tai-bu-dui-de-wen-ti/">MacOS的Battery显示充电状态不对的问题</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/setup-wireguard-vpn/">Setup wireguard VPN</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/rocketchat-server-stopped-on-an-update/">rocket.chat server stopped on an update</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/copy-file-content-to-clipboard-in-terminal/">Copy file content to clipboard in terminal</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/how-to-add-startpage-as-default-search-engine-in-firefox/">How to add &#34;startpage&#34; as default search engine in Firefox?</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/why-there-is-no-gets-function-in-c-standard-library/">Why there is no &#34;gets&#34; function in C standard library?</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/gnome-display-settings-enable-multiple-scales/">Gnome display settings enable multiple scales</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/array-and-pointer-in-c/">Array and Pointer in C</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/initialize-c-structure/">Initialize C Structure</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/back-pressure/">Back Pressure</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://bofeng.github.io/tag/xP4r-EC2O/" class="badge ">
+          macos
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/mwBNLmU18/" class="badge success">
+          wireguard
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/P7JfwZd9jo/" class="badge success">
+          vpn
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge warning">
+          linux
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge success">
+          ubuntu
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/wmuBy2O0Q/" class="badge warning">
+          snap
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/MIOrvhB7a/" class="badge ">
+          rocketchat
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Gm69OgM6-/" class="badge success">
+          shell
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/49HWll9Mi/" class="badge secondary">
+          firefox
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GVVsxSvsE-/" class="badge secondary">
+          privacy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/2SkWf0yxm/" class="badge success">
+          gcc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Xp4pUvOV9/" class="badge ">
+          c
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/B-lE5rjJQ/" class="badge warning">
+          websocket
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4mqNg88O5/" class="badge success">
+          nginx
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ldB2Nthcy/" class="badge success">
+          apache
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/jmsnxeb0L/" class="badge secondary">
+          webpy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dTSYjKA1x/" class="badge success">
+          passwd
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4NRPVT4nt/" class="badge secondary">
+          godaddy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Dr03KtaXl/" class="badge secondary">
+          raspi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/DfdCdjQwH/" class="badge secondary">
+          vnc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GLhh3mgC0/" class="badge success">
+          logroute
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Y-U7pc_rs/" class="badge secondary">
+          uwsgi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/2ldRfwlTHj/" class="badge warning">
+          ngrok
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/N7uzveFEQ/" class="badge secondary">
+          flask
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/t46GgOmQJ/" class="badge ">
+          classmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/7tN2CvtD1N/" class="badge secondary">
+          staticmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eSZ5lHy7P/" class="badge secondary">
+          python
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/8bPDgHSAN/" class="badge secondary">
+          web
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vJnENzWsf/" class="badge warning">
+          ssl
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dnoL5D0w-/" class="badge ">
+          mail
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/yuo6OYefk4/" class="badge warning">
+          smtp
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GS8sncYwZ/" class="badge success">
+          rsync
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/EXump4cPm/" class="badge success">
+          pypi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/LzDugb5gQm/" class="badge ">
+          cors
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rLcaXQkmK/" class="badge ">
+          vim
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vLxhso05B/" class="badge secondary">
+          strace
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/IbPl9to7C/" class="badge warning">
+          google
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/X_VKuDyUs/" class="badge success">
+          opensource
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/JPaKbEpxsK/" class="badge success">
+          license
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/0uGMCxZDs/" class="badge secondary">
+          mkdocs
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/K5ngz4Z3X/" class="badge warning">
+          cloudflare
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/XlycwU8qXZ/" class="badge secondary">
+          github
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/OLHLFT4if/" class="badge warning">
+          ssh
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/AWO0Br2y4/" class="badge ">
+          scratch
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0PlhyDUc/" class="badge success">
+          algorithm
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0zRGJ6aD/" class="badge success">
+          jQuery
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/3NETfISBbQ/" class="badge warning">
+          js
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4zLHN4PXY/" class="badge warning">
+          docker
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ROXx9algt/" class="badge success">
+          opencourse
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/1KJQkim0xD/" class="badge success">
+          course
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/-Mmbm4s8hZ/" class="badge secondary">
+          education
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/QibBEdubUA/" class="badge ">
+          chromebook
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rMdHe7zYUx/" class="badge ">
+          iOS
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/w0rUetnyT/" class="badge success">
+          life
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ypaP9jx_V/" class="badge ">
+          hls
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ITnA4khP_/" class="badge success">
+          protobuf
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/5XAvbVu7Y/" class="badge secondary">
+          loadbalance
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/G6EOG9dUqx/" class="badge secondary">
+          server
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/v-BqS_DjJ/" class="badge warning">
+          iPhone
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/I7SG4keW3/" class="badge secondary">
+          objc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/g_FfQMIOg/" class="badge success">
+          memcached
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eAw-5Salr/" class="badge secondary">
+          datamining
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

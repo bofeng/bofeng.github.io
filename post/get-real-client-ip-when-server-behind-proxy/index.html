@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Get real client ip when server is behind proxies | 0xBF</title>
+<meta name="description" content="">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://bofeng.github.io/favicon.ico?v=1610326532094">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://bofeng.github.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://bofeng.github.io">0xBF</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/open-source-license-flow-chart/" class="menu">
+                Open Source License
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>Get real client ip when server is behind proxies</h1>
+            <p class="article-meta">
+              2020-09-03
+              
+                <a href="https://bofeng.github.io/tag/6ZtqsOkBb/" class="badge success">
+                  digitalocean
+                </a>
+              
+                <a href="https://bofeng.github.io/tag/4mqNg88O5/" class="badge secondary">
+                  nginx
+                </a>
+              
+                <a href="https://bofeng.github.io/tag/K5ngz4Z3X/" class="badge warning">
+                  cloudflare
+                </a>
+              
+                <a href="https://bofeng.github.io/tag/5XAvbVu7Y/" class="badge secondary">
+                  loadbalance
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <h2 id="server-architecture-v1">Server Architecture V1</h2>
+<p>I was starting to use the DO's load balancer, my server architecture is like this:<br>
+<img src="https://bofeng.github.io/post-images/1599244822913.png" alt="" loading="lazy"></p>
+<p>I have Nginx running on my Droplets, and to get the real IP, we first need to config the DO's load balancer:</p>
+<ol>
+<li>go to Networking &gt; Load Balancers, select your balancer</li>
+<li>Under settings tab, click &quot;Proxy Protocol&quot; and enable it.</li>
+</ol>
+<p>Now in the Nginx on the droplet, first we need to enable the proxy protocol:</p>
+<pre><code class="language-nginx">server {
+        listen 80 proxy_protocol;
+        ...
+}
+</code></pre>
+<p>Now the website should work now behind the load balancer. But now in the server access log, the client IP is logged as the load balancer's IP, which is not what I want. I want to get the real client IP so I can do further geo location based feature.</p>
+<p>To get the real ip, first need to check if the Nginx has real_ip module installed.</p>
+<pre><code class="language-bash">nginx -V 2&gt;&amp;1 | grep -- 'http_realip_module'
+nginx -V 2&gt;&amp;1 | grep -- 'stream_realip_module'
+</code></pre>
+<p>I was using <code>apt install nginx</code> to install the default nginx, and the <code>http_realip_module</code> is installed by default. I don't have the second one, but I don't need it at this moment.</p>
+<p>Now back to our website's nginx config file:</p>
+<pre><code class="language-nginx">set_real_ip_from  10.108.0.0/20;
+real_ip_header X-Forwarded-For;
+proxy_set_header X-Real-IP       $proxy_protocol_addr;
+proxy_set_header X-Forwarded-For $proxy_protocol_addr;
+
+log_format mycombined '$proxy_protocol_addr - $remote_addr - $remote_user [$time_local] '
+                    '&quot;$request&quot; $status $body_bytes_sent '
+                    '&quot;$http_referer&quot; &quot;$http_user_agent&quot;';
+
+server {
+    ...
+    access_log /var/log/nginx/access.log mycombined;
+}
+</code></pre>
+<p>Here we use <code>set_real_ip_from</code> to define an IP range to indicate when a request is from this IP (my load balancer in this case), extra the real_ip_header field from the &quot;X-Forwarded-For&quot; field in the header. And also set the <code>X-Fowarded-For</code> header in order to forward this request to our real application handler (like Django or Starlette in my case). We also define a log_format which included the proxy_protocol and remote_addr. In our above architecture v1 case, these 2 IPs will be the same.</p>
+<blockquote>
+<p>... the $remote_addr and $remote_port variables retain the real IP address and port of the client, while the $realip_remote_addr and $realip_remote_port variables retain the IP address and port of the load balancer <sup>[1]</sup></p>
+</blockquote>
+<p>Once we define the log_format, we can use it for our access log. Also, if you want to limit some IP access, because we already extract the real ip from the header, you can add the allow/deny rules like normal in Nginx:</p>
+<pre><code>allow 203.0.113.10;
+deny all;
+</code></pre>
+<p><strong>Also, to secure the Droplet</strong>, we'd better set some firewall rules in the Droplet server such like only allow port 80 connections from the Load Balancer. We can set this Firewall rule in DO's &quot;Networking&quot; &gt; &quot;Firewalls&quot; Page.</p>
+<h2 id="server-architecture-v2">Server Architecture V2</h2>
+<p>Later I want to use CloudFlare to put in front of my DO's load balancer, yep, a proxy in front of another proxy, to prevent DDoS. CloudFlare has a good name on this.</p>
+<p>So first I need to transfer my domain's DNS to CloudFlare, and the server architecture like this:</p>
+<figure data-type="image" tabindex="1"><img src="https://bofeng.github.io/post-images/1599246314807.png" alt="" loading="lazy"></figure>
+<p>Now we need to change our Nginx settings to get the client's real IP b/c there are 2 layer of proxies. According to the doc:</p>
+<blockquote>
+<p>CF-Connecting-IP<br>
+Provides the client (visitor) IP address (connecting to Cloudflare) to the origin web server. <sup>3</sup></p>
+</blockquote>
+<p>So we can get the client ip from the <code>CF-Connecting-IP</code> header field. Let's change our configs in Nginx:</p>
+<pre><code>set_real_ip_from  10.108.0.0/20;
+real_ip_header CF-Connecting-IP;
+proxy_set_header X-Real-IP       $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_protocol_addr;
+</code></pre>
+<p>Now we grab the real_ip from the <code>CF-Connecting-IP</code> header, and set that IP to X-Real-IP header for our real app handlers. Please notice now that the <code>$proxy_protocol_addr</code> and <code>remote_addr</code> are different now. The former one is CloudFlare's proxy server IP and the latter one is the client's real IP. You can see that in the access log:</p>
+<pre><code>108.163.218.1 - 203.0.113.10 - - [04/Sep/2020:19:11:11 +0000] &quot;GET / HTTP/1.1&quot; 200 396 &quot;-&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:79.0) Gecko/20100101 Firefox/79.0&quot;
+</code></pre>
+<p>Two other things:</p>
+<ol>
+<li>
+<p>Now if we want to limit some IP access, we don't have to add the IP in the Nginx config. We can directly set a Firewall rule in CloudFlare. Just go to the &quot;Firewall Rules&quot; tab to add a new Firewall rule, like this:<br>
+<img src="https://bofeng.github.io/post-images/1599246920955.png" alt="" loading="lazy"></p>
+</li>
+<li>
+<p>CloudFlare will auto generate a SSL for our domain. When user visit CloudFlare's proxy server, the connection is encrypted, then CloudFlare will proxy that request to our load balancer, so this part connection should also be encrypted. We need to add the forwarding rule to DO's load balancer:</p>
+<ol>
+<li>Generate SSL cert in CloudFlare: go to SSL/TLS table, click &quot;Origin Server&quot;, click &quot;create certificate&quot;</li>
+<li>Grab the certificate data, copy and paste them to DO's load balancer settings: In DO's load balancer settings, click the &quot;forwarding rules&quot;, add forwarding HTTPS:443 to HTTP:80 (our droplet), and one of the field will require you add SSL certificate, click &quot;+ New Certificate&quot; &gt; &quot;Bring your own cerficate&quot;, in there paste your SSL cert generated from the previous step.</li>
+</ol>
+</li>
+</ol>
+<figure data-type="image" tabindex="2"><img src="https://bofeng.github.io/post-images/1599247516756.png" alt="" loading="lazy"></figure>
+<p>Now the architecture looks good: CloudFlare will prevent DDoS, and forward secure data to DO's load balancer, then the load balancer will forward data to backend droplets, and our droplets only allow connections from the load balancer, so it cannot be acessed from other public IP, which make it very secure, plus via the Nginx settings, we are still able to grab Client's real IP behind 2 layers proxies. Hooray!</p>
+<h2 id="reference">Reference</h2>
+<ul>
+<li><a href="https://docs.nginx.com/nginx/admin-guide/load-balancer/using-proxy-protocol/">Nginx Proxy Settings</a></li>
+<li><a href="https://www.digitalocean.com/docs/networking/load-balancers/">DigitalOcean's load balancer doc</a></li>
+<li><a href="https://support.cloudflare.com/hc/en-us/articles/200170986-How-does-Cloudflare-handle-HTTP-Request-headers-">CloudFlare Proxy Settings</a></li>
+</ul>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://bofeng.github.io/post/macos-de-battery-xian-shi-chong-dian-zhuang-tai-bu-dui-de-wen-ti/">
+                <h3 class="post-title">
+                  MacOS的Battery显示充电状态不对的问题
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://bofeng.github.io/images/avatar.png?v=1610326532094" class="no-responsive avatar">
+    <div class="text-muted"></div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/play-with-ipfs/">Play w/ IPFS</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/get-real-client-ip-when-server-behind-proxy/">Get real client ip when server is behind proxies</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/macos-de-battery-xian-shi-chong-dian-zhuang-tai-bu-dui-de-wen-ti/">MacOS的Battery显示充电状态不对的问题</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/setup-wireguard-vpn/">Setup wireguard VPN</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/rocketchat-server-stopped-on-an-update/">rocket.chat server stopped on an update</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/copy-file-content-to-clipboard-in-terminal/">Copy file content to clipboard in terminal</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/how-to-add-startpage-as-default-search-engine-in-firefox/">How to add &#34;startpage&#34; as default search engine in Firefox?</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/why-there-is-no-gets-function-in-c-standard-library/">Why there is no &#34;gets&#34; function in C standard library?</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/gnome-display-settings-enable-multiple-scales/">Gnome display settings enable multiple scales</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://bofeng.github.io/post/array-and-pointer-in-c/">Array and Pointer in C</a>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://bofeng.github.io/tag/6ZtqsOkBb/" class="badge warning">
+          digitalocean
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4mqNg88O5/" class="badge ">
+          nginx
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/K5ngz4Z3X/" class="badge secondary">
+          cloudflare
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/5XAvbVu7Y/" class="badge ">
+          loadbalance
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/xP4r-EC2O/" class="badge ">
+          macos
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/mwBNLmU18/" class="badge ">
+          wireguard
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/P7JfwZd9jo/" class="badge secondary">
+          vpn
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/6jBa1--fpS/" class="badge secondary">
+          linux
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Jo5ZHkrbX/" class="badge success">
+          ubuntu
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/wmuBy2O0Q/" class="badge warning">
+          snap
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/MIOrvhB7a/" class="badge secondary">
+          rocketchat
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Gm69OgM6-/" class="badge success">
+          shell
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/49HWll9Mi/" class="badge secondary">
+          firefox
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GVVsxSvsE-/" class="badge secondary">
+          privacy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/2SkWf0yxm/" class="badge secondary">
+          gcc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Xp4pUvOV9/" class="badge secondary">
+          c
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/B-lE5rjJQ/" class="badge success">
+          websocket
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ldB2Nthcy/" class="badge success">
+          apache
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/jmsnxeb0L/" class="badge ">
+          webpy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dTSYjKA1x/" class="badge secondary">
+          passwd
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4NRPVT4nt/" class="badge warning">
+          godaddy
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Dr03KtaXl/" class="badge ">
+          raspi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/DfdCdjQwH/" class="badge secondary">
+          vnc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GLhh3mgC0/" class="badge secondary">
+          logroute
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/Y-U7pc_rs/" class="badge ">
+          uwsgi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/2ldRfwlTHj/" class="badge warning">
+          ngrok
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/N7uzveFEQ/" class="badge warning">
+          flask
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/t46GgOmQJ/" class="badge success">
+          classmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/7tN2CvtD1N/" class="badge warning">
+          staticmethod
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eSZ5lHy7P/" class="badge secondary">
+          python
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/8bPDgHSAN/" class="badge warning">
+          web
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vJnENzWsf/" class="badge secondary">
+          ssl
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/dnoL5D0w-/" class="badge secondary">
+          mail
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/yuo6OYefk4/" class="badge secondary">
+          smtp
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/GS8sncYwZ/" class="badge secondary">
+          rsync
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/EXump4cPm/" class="badge ">
+          pypi
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/LzDugb5gQm/" class="badge secondary">
+          cors
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rLcaXQkmK/" class="badge secondary">
+          vim
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/vLxhso05B/" class="badge secondary">
+          strace
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/IbPl9to7C/" class="badge success">
+          google
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/X_VKuDyUs/" class="badge secondary">
+          opensource
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/JPaKbEpxsK/" class="badge ">
+          license
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/0uGMCxZDs/" class="badge secondary">
+          mkdocs
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/XlycwU8qXZ/" class="badge ">
+          github
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/OLHLFT4if/" class="badge ">
+          ssh
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/AWO0Br2y4/" class="badge ">
+          scratch
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0PlhyDUc/" class="badge secondary">
+          algorithm
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/O0zRGJ6aD/" class="badge warning">
+          jQuery
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/3NETfISBbQ/" class="badge success">
+          js
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/4zLHN4PXY/" class="badge warning">
+          docker
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ROXx9algt/" class="badge success">
+          opencourse
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/1KJQkim0xD/" class="badge warning">
+          course
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/-Mmbm4s8hZ/" class="badge secondary">
+          education
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/QibBEdubUA/" class="badge warning">
+          chromebook
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/rMdHe7zYUx/" class="badge ">
+          iOS
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/w0rUetnyT/" class="badge ">
+          life
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ypaP9jx_V/" class="badge warning">
+          hls
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/ITnA4khP_/" class="badge ">
+          protobuf
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/G6EOG9dUqx/" class="badge ">
+          server
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/v-BqS_DjJ/" class="badge warning">
+          iPhone
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/I7SG4keW3/" class="badge success">
+          objc
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/g_FfQMIOg/" class="badge secondary">
+          memcached
+        </a>
+      
+        <a href="https://bofeng.github.io/tag/eAw-5Salr/" class="badge success">
+          datamining
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

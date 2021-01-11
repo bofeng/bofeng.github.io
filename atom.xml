@@ -2,13 +2,205 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://bofeng.github.io</id>
     <title>0xBF</title>
-    <updated>2020-08-13T03:55:41.710Z</updated>
+    <updated>2021-01-11T00:56:13.956Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://bofeng.github.io"/>
     <link rel="self" href="https://bofeng.github.io/atom.xml"/>
     <logo>https://bofeng.github.io/images/avatar.png</logo>
     <icon>https://bofeng.github.io/favicon.ico</icon>
-    <rights>All rights reserved 2020, 0xBF</rights>
+    <rights>All rights reserved 2021, 0xBF</rights>
+    <entry>
+        <title type="html"><![CDATA[Play w/ IPFS]]></title>
+        <id>https://bofeng.github.io/post/play-with-ipfs/</id>
+        <link href="https://bofeng.github.io/post/play-with-ipfs/">
+        </link>
+        <updated>2021-01-10T10:48:02.000Z</updated>
+        <content type="html"><![CDATA[<p>IPFS is a p2p file system.</p>
+<h2 id="installation">Installation</h2>
+<p>I am using Pop! OS which is a Ubuntu based, so intall the ipfs is pretty easy:</p>
+<pre><code class="language-bash">snap install ipfs
+</code></pre>
+<p><code>ipfs</code> stores settings and files in repo, so if this is the first time you install ipfs, you need to initialize it <code>ipfs init</code>.</p>
+<h2 id="add-file">Add file</h2>
+<p>Now you can use <code>ipfs</code> to add file:</p>
+<pre><code class="language-bash">$ ipfs add feeds.json
+added QmYzTnTfxduwx1N88MyUg4Jushbm7pw1WPSSedMz8WP9RY feeds.json
+</code></pre>
+<p>The <code>QmYzTnTfxduwx1N88MyUg4Jushbm7pw1WPSSedMz8WP9RY</code> is your file's hash.</p>
+<h2 id="take-node-online">Take node online</h2>
+<pre><code class="language-bash">$ ipfs daemon
+...
+API server listening on /ip4/127.0.0.1/tcp/5001
+WebUI: http://127.0.0.1:5001/webui
+Gateway (readonly) server listening on /ip4/127.0.0.1/tcp/8080
+Daemon is ready
+</code></pre>
+<p>Now your IPFS node is online, your node server is by default running at 5001 port, and the gateway is running at 8080 port. The daemon provides a WebUI which you can directly visit in your browser: http://127.0.0.1:5001/webui<br>
+Also since your node is online now, other peers can detect and connect to your node.<br>
+See your peers address with command <code>ipfs swarm peers</code></p>
+<p>And for the file you added, its address is <code>ipfs://QmYzTnTfxduwx1N88MyUg4Jushbm7pw1WPSSedMz8WP9RY</code>, but since brower doesn't understand the protocol, it won't know how to open the file - that's where the gateway does it work - the address will fall back to <code>http://localhost:8080/ipfs/QmYzTnTfxduwx1N88MyUg4Jushbm7pw1WPSSedMz8WP9RY</code>. Notice the localhost:8080 is your gateway address, and browser support http protocol, so now you can see your file in your browser. Plus, the best thing is, since it is a P2P network, other nodes can detect and cache your file, you can change it to other gateways, like <code>http://ipfs.io/ipfs/QmYzTnTfxduwx1N88MyUg4Jushbm7pw1WPSSedMz8WP9RY</code></p>
+<p>Other popular public gateways are:</p>
+<ul>
+<li>dweb.link</li>
+<li>cloudflare-ipfs.com</li>
+<li>cf-ipfs.com</li>
+</ul>
+<p>More public gateway domains you can find it <a href="https://ipfs.github.io/public-gateway-checker/">here</a>.</p>
+<h2 id="add-folder">Add folder</h2>
+<p>You can host your static files/website, say you have a folder named &quot;website&quot; which contains your static files:</p>
+<ul>
+<li>index.html</li>
+<li>cook.jpg</li>
+</ul>
+<p>Code in the <code>index.html</code>:</p>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;0xBF's play ground&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;center&gt;
+    &lt;h1&gt;IPFS Play Ground&lt;/h1&gt;
+    &lt;h2&gt;tasty salad&lt;/h2&gt;
+    &lt;p&gt;
+        &lt;img src=&quot;cook.jpg&quot; width=&quot;600px&quot;&gt;
+    &lt;p&gt;
+    &lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>Now put the whole folder online:</p>
+<pre><code class="language-bash">$ ipfs add -r website
+added QmTJtZJAmiVoCo7b8LDLHKoQAt5DBFeFc6D2mPxYiEkGVx website/cook.jpg
+added QmUqn9j8j5S557jdZuT5yj9dntk7wzWpZbFW5y838M3PVf website/index.html
+added QmdUbiyC685LKYZkJCXfZsMnntku9DoX2PAuJsQtKwv5HL website
+</code></pre>
+<p>The last hash <code>QmdUbiyC685LKYZkJCXfZsMnntku9DoX2PAuJsQtKwv5HL</code> if your folder's IPFS address. If you visit <code>http://localhost:8080/ipfs/QmdUbiyC685LKYZkJCXfZsMnntku9DoX2PAuJsQtKwv5HL</code> you will be able to see your site. And if you change the gateway address to some other public gateway address, it will work too (like https://ipfs.io/ipfs/QmdUbiyC685LKYZkJCXfZsMnntku9DoX2PAuJsQtKwv5HL)</p>
+<h2 id="ipns">IPNS</h2>
+<p>If you made some change to the files in website folder, or add some other files, which is not uncommon to update the website, you need to do the <code>ipfs add -r</code> again, but you will find that the folder's hash has changed, now the website address is <code>https://ipfs.io/ipfs/&lt;some other hash value&gt;</code>. This is very inconvenient if you shared your website address to others, and after you updated the files, your website address changed and you need to re-share the url address. IPNS can help to solve this problem.</p>
+<p>IPNS is a &quot;name server&quot;, like the DNS system which point a domain name to some ip address. IPNS is used for pointing a fixed <code>ipns</code> hash to a <code>ipfs</code> hash.</p>
+<p>To use the IPNS you need to do <code>name publish</code>. Take the above for example, we know the website's <strong>ipfs</strong> hash is <code>QmdUbiyC685LKYZkJCXfZsMnntku9DoX2PAuJsQtKwv5HL</code>, now just need to publish it:</p>
+<pre><code class="language-bash">$ ipfs name publish QmdUbiyC685LKYZkJCXfZsMnntku9DoX2PAuJsQtKwv5HL
+Published to k51qzi5uqu5dg85apeizh0th2b008n2xmywwnf96coy9an98dd0k1esuyxi0zw: /ipfs/QmdUbiyC685LKYZkJCXfZsMnntku9DoX2PAuJsQtKwv5HL
+</code></pre>
+<p>Now we get the <strong>ipns</strong> hash: <code>k51qzi5uqu5dg85apeizh0th2b008n2xmywwnf96coy9an98dd0k1esuyxi0zw</code><br>
+Then you can visit your website at: <code>https://ipfs.io/ipns/k51qzi5uqu5dg85apeizh0th2b008n2xmywwnf96coy9an98dd0k1esuyxi0zw</code> , notice here in the middle of the path, it is <code>ipns</code>, not <code>ipfs</code>.</p>
+<p>Say now we made some change to our website folder, let's add it again to IPFS:</p>
+<pre><code class="language-bash">$ ipfs add -r website
+added QmTJtZJAmiVoCo7b8LDLHKoQAt5DBFeFc6D2mPxYiEkGVx website/cook.jpg
+added QmeFPgorCSs6F2u58hmnujKaW9h7GopuXWHgvDTn3vkCsy website/index.html
+added Qmd3yZhAKsyFuSgG81d3VM8nRUyzrfttsyZXka4AfPgAWP website
+</code></pre>
+<p><code>Qmd3yZhAKsyFuSgG81d3VM8nRUyzrfttsyZXka4AfPgAWP</code> is the new <strong>ipfs</strong> hash for our website folder. We need to publish it again:</p>
+<pre><code class="language-bash">$ ipfs name publish Qmd3yZhAKsyFuSgG81d3VM8nRUyzrfttsyZXka4AfPgAWP
+Published to k51qzi5uqu5dg85apeizh0th2b008n2xmywwnf96coy9an98dd0k1esuyxi0zw: /ipfs/Qmd3yZhAKsyFuSgG81d3VM8nRUyzrfttsyZXka4AfPgAWP
+</code></pre>
+<p>You can see the ipns hash stay unchanged. Now you fresh the above ipns address (https://ipfs.io/ipns/k51qzi5uqu5dg85apeizh0th2b008n2xmywwnf96coy9an98dd0k1esuyxi0zw)in the browser, you will be able to see the updated version. Under the hood, the ipns address now points to the new ipfs hash.</p>
+<h2 id="when-your-server-is-offline">When your server is offline</h2>
+<p>You can take your server down, in the command line, just use Ctrl-C to quit the <code>ipfs daemon</code>. After that, your file might still be visited from other gateway or nodes. It depends on how other node handle your file. For example, after you visit the above ipfs.io gateway will cache your files for several hours, so even your server is taken down, you can still visit your website at that address for several hours until the gameway ipfs.io purge its cache. If the node do further - not only cache your file but also <code>pin</code> your file - your file will be stored in their server, then you can keep visiting the address until other nodes take it down.</p>
+<h2 id="reference">Reference</h2>
+<ul>
+<li><a href="https://docs.ipfs.io/install/command-line/">Installation</a></li>
+<li><a href="https://dweb-primer.ipfs.io/publishing-changes/modify-republish">Modify Your Webpage and Republish to IPNS</a></li>
+<li><a href="https://github.com/ipfs/ipfs">IPFS Repo</a></li>
+<li><a href="https://docs.ipfs.io/install/ipfs-companion/">IPFS Companion</a></li>
+<li><a href="https://discuss.ipfs.io/t/after-my-local-server-stops-hosting-the-file-where-does-the-file-go/1438">After my local server stops hosting the file, where does the file go?</a></li>
+<li><a href="https://medium.com/python-pandemonium/getting-started-with-python-and-ipfs-94d14fdffd10">Getting started with Python and IPFS</a></li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Get real client ip when server is behind proxies]]></title>
+        <id>https://bofeng.github.io/post/get-real-client-ip-when-server-behind-proxy/</id>
+        <link href="https://bofeng.github.io/post/get-real-client-ip-when-server-behind-proxy/">
+        </link>
+        <updated>2020-09-03T06:38:45.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="server-architecture-v1">Server Architecture V1</h2>
+<p>I was starting to use the DO's load balancer, my server architecture is like this:<br>
+<img src="https://bofeng.github.io/post-images/1599244822913.png" alt="" loading="lazy"></p>
+<p>I have Nginx running on my Droplets, and to get the real IP, we first need to config the DO's load balancer:</p>
+<ol>
+<li>go to Networking &gt; Load Balancers, select your balancer</li>
+<li>Under settings tab, click &quot;Proxy Protocol&quot; and enable it.</li>
+</ol>
+<p>Now in the Nginx on the droplet, first we need to enable the proxy protocol:</p>
+<pre><code class="language-nginx">server {
+        listen 80 proxy_protocol;
+        ...
+}
+</code></pre>
+<p>Now the website should work now behind the load balancer. But now in the server access log, the client IP is logged as the load balancer's IP, which is not what I want. I want to get the real client IP so I can do further geo location based feature.</p>
+<p>To get the real ip, first need to check if the Nginx has real_ip module installed.</p>
+<pre><code class="language-bash">nginx -V 2&gt;&amp;1 | grep -- 'http_realip_module'
+nginx -V 2&gt;&amp;1 | grep -- 'stream_realip_module'
+</code></pre>
+<p>I was using <code>apt install nginx</code> to install the default nginx, and the <code>http_realip_module</code> is installed by default. I don't have the second one, but I don't need it at this moment.</p>
+<p>Now back to our website's nginx config file:</p>
+<pre><code class="language-nginx">set_real_ip_from  10.108.0.0/20;
+real_ip_header X-Forwarded-For;
+proxy_set_header X-Real-IP       $proxy_protocol_addr;
+proxy_set_header X-Forwarded-For $proxy_protocol_addr;
+
+log_format mycombined '$proxy_protocol_addr - $remote_addr - $remote_user [$time_local] '
+                    '&quot;$request&quot; $status $body_bytes_sent '
+                    '&quot;$http_referer&quot; &quot;$http_user_agent&quot;';
+
+server {
+    ...
+    access_log /var/log/nginx/access.log mycombined;
+}
+</code></pre>
+<p>Here we use <code>set_real_ip_from</code> to define an IP range to indicate when a request is from this IP (my load balancer in this case), extra the real_ip_header field from the &quot;X-Forwarded-For&quot; field in the header. And also set the <code>X-Fowarded-For</code> header in order to forward this request to our real application handler (like Django or Starlette in my case). We also define a log_format which included the proxy_protocol and remote_addr. In our above architecture v1 case, these 2 IPs will be the same.</p>
+<blockquote>
+<p>... the $remote_addr and $remote_port variables retain the real IP address and port of the client, while the $realip_remote_addr and $realip_remote_port variables retain the IP address and port of the load balancer <sup>[1]</sup></p>
+</blockquote>
+<p>Once we define the log_format, we can use it for our access log. Also, if you want to limit some IP access, because we already extract the real ip from the header, you can add the allow/deny rules like normal in Nginx:</p>
+<pre><code>allow 203.0.113.10;
+deny all;
+</code></pre>
+<p><strong>Also, to secure the Droplet</strong>, we'd better set some firewall rules in the Droplet server such like only allow port 80 connections from the Load Balancer. We can set this Firewall rule in DO's &quot;Networking&quot; &gt; &quot;Firewalls&quot; Page.</p>
+<h2 id="server-architecture-v2">Server Architecture V2</h2>
+<p>Later I want to use CloudFlare to put in front of my DO's load balancer, yep, a proxy in front of another proxy, to prevent DDoS. CloudFlare has a good name on this.</p>
+<p>So first I need to transfer my domain's DNS to CloudFlare, and the server architecture like this:</p>
+<figure data-type="image" tabindex="1"><img src="https://bofeng.github.io/post-images/1599246314807.png" alt="" loading="lazy"></figure>
+<p>Now we need to change our Nginx settings to get the client's real IP b/c there are 2 layer of proxies. According to the doc:</p>
+<blockquote>
+<p>CF-Connecting-IP<br>
+Provides the client (visitor) IP address (connecting to Cloudflare) to the origin web server. <sup>3</sup></p>
+</blockquote>
+<p>So we can get the client ip from the <code>CF-Connecting-IP</code> header field. Let's change our configs in Nginx:</p>
+<pre><code>set_real_ip_from  10.108.0.0/20;
+real_ip_header CF-Connecting-IP;
+proxy_set_header X-Real-IP       $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_protocol_addr;
+</code></pre>
+<p>Now we grab the real_ip from the <code>CF-Connecting-IP</code> header, and set that IP to X-Real-IP header for our real app handlers. Please notice now that the <code>$proxy_protocol_addr</code> and <code>remote_addr</code> are different now. The former one is CloudFlare's proxy server IP and the latter one is the client's real IP. You can see that in the access log:</p>
+<pre><code>108.163.218.1 - 203.0.113.10 - - [04/Sep/2020:19:11:11 +0000] &quot;GET / HTTP/1.1&quot; 200 396 &quot;-&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:79.0) Gecko/20100101 Firefox/79.0&quot;
+</code></pre>
+<p>Two other things:</p>
+<ol>
+<li>
+<p>Now if we want to limit some IP access, we don't have to add the IP in the Nginx config. We can directly set a Firewall rule in CloudFlare. Just go to the &quot;Firewall Rules&quot; tab to add a new Firewall rule, like this:<br>
+<img src="https://bofeng.github.io/post-images/1599246920955.png" alt="" loading="lazy"></p>
+</li>
+<li>
+<p>CloudFlare will auto generate a SSL for our domain. When user visit CloudFlare's proxy server, the connection is encrypted, then CloudFlare will proxy that request to our load balancer, so this part connection should also be encrypted. We need to add the forwarding rule to DO's load balancer:</p>
+<ol>
+<li>Generate SSL cert in CloudFlare: go to SSL/TLS table, click &quot;Origin Server&quot;, click &quot;create certificate&quot;</li>
+<li>Grab the certificate data, copy and paste them to DO's load balancer settings: In DO's load balancer settings, click the &quot;forwarding rules&quot;, add forwarding HTTPS:443 to HTTP:80 (our droplet), and one of the field will require you add SSL certificate, click &quot;+ New Certificate&quot; &gt; &quot;Bring your own cerficate&quot;, in there paste your SSL cert generated from the previous step.</li>
+</ol>
+</li>
+</ol>
+<figure data-type="image" tabindex="2"><img src="https://bofeng.github.io/post-images/1599247516756.png" alt="" loading="lazy"></figure>
+<p>Now the architecture looks good: CloudFlare will prevent DDoS, and forward secure data to DO's load balancer, then the load balancer will forward data to backend droplets, and our droplets only allow connections from the load balancer, so it cannot be acessed from other public IP, which make it very secure, plus via the Nginx settings, we are still able to grab Client's real IP behind 2 layers proxies. Hooray!</p>
+<h2 id="reference">Reference</h2>
+<ul>
+<li><a href="https://docs.nginx.com/nginx/admin-guide/load-balancer/using-proxy-protocol/">Nginx Proxy Settings</a></li>
+<li><a href="https://www.digitalocean.com/docs/networking/load-balancers/">DigitalOcean's load balancer doc</a></li>
+<li><a href="https://support.cloudflare.com/hc/en-us/articles/200170986-How-does-Cloudflare-handle-HTTP-Request-headers-">CloudFlare Proxy Settings</a></li>
+</ul>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[MacOS的Battery显示充电状态不对的问题]]></title>
         <id>https://bofeng.github.io/post/macos-de-battery-xian-shi-chong-dian-zhuang-tai-bu-dui-de-wen-ti/</id>
@@ -513,101 +705,6 @@ Inside func: 8
 <li><a href="https://stackoverflow.com/questions/851958/where-do-malloc-and-free-store-allocated-sizes-and-addresses">https://stackoverflow.com/questions/851958/where-do-malloc-and-free-store-allocated-sizes-and-addresses</a></li>
 <li><a href="https://stackoverflow.com/questions/10078283/how-sizeofarray-works-at-runtime">https://stackoverflow.com/questions/10078283/how-sizeofarray-works-at-runtime</a></li>
 </ol>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Initialize C Structure]]></title>
-        <id>https://bofeng.github.io/post/initialize-c-structure/</id>
-        <link href="https://bofeng.github.io/post/initialize-c-structure/">
-        </link>
-        <updated>2020-04-03T17:15:54.000Z</updated>
-        <content type="html"><![CDATA[<p>Define C structure and initialize it.</p>
-<pre><code class="language-c">#include &lt;stdio.h&gt;
-
-typedef struct _date {
-    int year;
-    int month;
-    int day;
-} Date;
-
-
-typedef struct _time {
-    int hour;
-    int minute;
-    int second;
-} Time;
-
-typedef struct _datetime {
-    Date date;
-    Time time;
-} Datetime;
-
-
-void print_date(Date date) {
-    printf(&quot;Year: %d, Month: %d, Day: %d\n&quot;, date.year, date.month, date.day);
-}
-
-void print_datetime(Datetime dt) {
-    printf(&quot;%d-%d-%d %d:%d:%d\n&quot;, 
-           dt.date.year, dt.date.month, dt.date.day,
-           dt.time.hour, dt.time.minute, dt.time.second);
-}
-
-
-int main() {
-    Date today = {2020, 4, 4};
-    Date tomorrow = {.year=2020, .month=4, .day=5};
-
-    print_date(today);
-    print_date(tomorrow);
-
-    today = (Date) {2020, 4, 3};
-    print_date(today);
-
-    Datetime now = {
-        {2020, 4, 4},
-        {.hour=13, .minute=37, .second=40}
-    };
-    print_datetime(now);
-
-    return 0;
-}
-</code></pre>
-<p>Compile and run:</p>
-<pre><code>Year: 2020, Month: 4, Day: 4
-Year: 2020, Month: 4, Day: 5
-Year: 2020, Month: 4, Day: 3
-2020-4-4 13:37:40
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Back Pressure]]></title>
-        <id>https://bofeng.github.io/post/back-pressure/</id>
-        <link href="https://bofeng.github.io/post/back-pressure/">
-        </link>
-        <updated>2020-02-23T05:17:54.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="resources">Resources:</h2>
-<p>1, <a href="https://medium.com/@jayphelps/backpressure-explained-the-flow-of-data-through-software-2350b3e77ce7">Backpressure explained — the resisted flow of data through software</a></p>
-<p>2, Flask Author: <a href="https://lucumr.pocoo.org/2020/1/1/async-pressure/">I'm not feeling the async pressure</a></p>
-<p>3, Answer from Starlette author: <a href="https://github.com/encode/starlette/issues/802#issuecomment-574606003">Back pressure?</a> :</p>
-<blockquote>
-<p>However network backpressure isn't actually the only thing we'd like to have in place here. We also want to ensure resource limiting at any potential bottlenecks. The most notable case here would be the number of available database connections.</p>
-<p>Uvicorn currently allows you to set a --limit-concurrency <int> which hard-limits the maximum number of allowable tasks which may be running before 503's will be returned. In the most constrained case you could just set this based on the number of available database connections.</p>
-</blockquote>
-<p>4, Answer from FastAPI: <a href="https://github.com/tiangolo/fastapi/issues/857">Back pressure?</a> :</p>
-<blockquote>
-<p>the author of starlette has been aware of this issue for (at least) going on two years so I don't think there is any reason to panic<br>
-... in practice you can usually prevent backpressure issues by just using a rate-limiting load balancer and a good auto-scaling policy. This won't handle all cases, and won't save you from particularly bad design choices, but for 99% of deployed python applications this would already be overkill.</p>
-</blockquote>
-<p>5, <a href="https://stackoverflow.com/questions/54454841/performance-decrease-when-using-nginx-as-reverse-proxy-for-sanic-gunicorn">Use sanic with Nginx</a></p>
-<blockquote>
-<p>Normally, nginx is supposed to control the backpressure for your backend ...</p>
-</blockquote>
-<p>6, <a href="https://pymongo.readthedocs.io/en/3.10.0/api/pymongo/mongo_client.html#pymongo.mongo_client.MongoClient">Pymongo's connection pool size</a></p>
-<blockquote>
-<p>maxPoolSize (optional): The maximum allowable number of concurrent connections to each connected server. Requests to a server will block if there are maxPoolSize outstanding connections to the requested server. Defaults to 100. Cannot be 0.</p>
-</blockquote>
 ]]></content>
     </entry>
 </feed>
